@@ -9,9 +9,9 @@ on:
     branches: [ main ]
 
 jobs:
-  # ─── Test Job ──────────────────────────────────────────────────────────
+  # ─── Test Job — runs on ALL pushes and PRs ────────────────────────────
   test:
-    name: Test (${{ matrix.os }})
+    name: Test (${{ matrix.os }} / Python ${{ matrix.python-version }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -27,11 +27,6 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install pyinstaller  # For packaging tests
-
     - name: Run comprehensive tests
       run: |
         cd tests
@@ -42,7 +37,7 @@ jobs:
         cd tests
         python test_compiler.py
 
-    - name: Run all tests
+    - name: Run all tests (combined)
       run: |
         cd tests
         python -c "
@@ -55,7 +50,7 @@ success2 = run_compiler()
 sys.exit(0 if (success1 and success2) else 1)
 "
 
-  # ─── Lint Job ──────────────────────────────────────────────────────────
+  # ─── Lint Job — runs on ALL pushes and PRs ────────────────────────────
   lint:
     name: Lint
     runs-on: ubuntu-latest
@@ -77,9 +72,9 @@ sys.exit(0 if (success1 and success2) else 1)
         flake8 src/ --count --select=E9,F63,F7,F82 --show-source --statistics
         flake8 src/ --count --max-complexity=15 --max-line-length=120 --statistics
 
-  # ─── Build Job ─────────────────────────────────────────────────────────
+  # ─── Build Job — runs on ALL pushes and PRs ───────────────────────────
   build:
-    name: Build
+    name: Build (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -102,82 +97,17 @@ sys.exit(0 if (success1 and success2) else 1)
     - name: Build executable
       run: |
         cd src
-        pyinstaller --onefile --name samrat main.py
-        # Also build CLI
-        pyinstaller --onefile --name samrat-cli cli.py
+        pyinstaller --onefile --name samrat-${{ runner.os }} main.py
+        pyinstaller --onefile --name samrat-cli-${{ runner.os }} cli.py
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: samrat-${{ matrix.os }}
+        name: samrat-${{ runner.os }}
         path: |
-          src/dist/samrat*
-          src/dist/samrat-cli*
+          src/dist/samrat-*
 
-  # ─── Release Job ───────────────────────────────────────────────────────
-  release:
-    name: Release
-    needs: [test, lint, build]
-    if: startsWith(github.ref, 'refs/tags/v')
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.12'
-
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install pyinstaller
-
-    - name: Build all platforms
-      run: |
-        # Build for Linux
-        cd src
-        pyinstaller --onefile --name samrat-linux main.py
-        pyinstaller --onefile --name samrat-cli-linux cli.py
-        mv dist/samrat-linux ../samrat-linux
-        mv dist/samrat-cli-linux ../samrat-cli-linux
-
-    - name: Create source archives
-      run: |
-        # Create source tarball
-        tar -czf samrat-source.tar.gz \
-          --exclude='__pycache__' \
-          --exclude='.git' \
-          --exclude='dist' \
-          --exclude='build' \
-          --exclude='*.pyc' \
-          .
-        # Create source zip
-        zip -r samrat-source.zip . \
-          -x '__pycache__/*' '.git/*' 'dist/*' 'build/*' '*.pyc'
-
-    - name: Generate checksums
-      run: |
-        sha256sum samrat-linux samrat-cli-linux samrat-source.tar.gz samrat-source.zip > checksums.txt
-
-    - name: Create Release
-      uses: softprops/action-gh-release@v1
-      with:
-        name: Samrat ${{ github.ref_name }}
-        body_path: CHANGELOG.md
-        draft: false
-        prerelease: false
-        files: |
-          samrat-linux
-          samrat-cli-linux
-          samrat-source.tar.gz
-          samrat-source.zip
-          checksums.txt
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  # ─── Security Scan ─────────────────────────────────────────────────────
+  # ─── Security Scan — runs on ALL pushes and PRs ───────────────────────
   security:
     name: Security Scan
     runs-on: ubuntu-latest
@@ -203,3 +133,65 @@ sys.exit(0 if (success1 and success2) else 1)
       with:
         name: security-report
         path: security-report.json
+
+  # ─── Release Job — runs ONLY on version tags (v*) ────────────────────
+  release:
+    name: Release ${{ github.ref_name }}
+    needs: [test, lint, build, security]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller
+
+    - name: Build Linux executables
+      run: |
+        cd src
+        pyinstaller --onefile --name samrat-linux main.py
+        pyinstaller --onefile --name samrat-cli-linux cli.py
+        mv dist/samrat-linux ../samrat-linux
+        mv dist/samrat-cli-linux ../samrat-cli-linux
+
+    - name: Create source archives
+      run: |
+        # Create source tarball
+        tar -czf samrat-source.tar.gz \
+          --exclude='__pycache__' \
+          --exclude='.git' \
+          --exclude='dist' \
+          --exclude='build' \
+          --exclude='*.pyc' \
+          .
+        # Create source zip
+        zip -r samrat-source.zip . \
+          -x '__pycache__/*' '.git/*' 'dist/*' 'build/*' '*.pyc'
+
+    - name: Generate checksums
+      run: |
+        sha256sum samrat-linux samrat-cli-linux samrat-source.tar.gz samrat-source.zip > checksums.txt
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        name: Samrat ${{ github.ref_name }}
+        body_path: docs/CHANGELOG.md
+        draft: false
+        prerelease: false
+        files: |
+          samrat-linux
+          samrat-cli-linux
+          samrat-source.tar.gz
+          samrat-source.zip
+          checksums.txt
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

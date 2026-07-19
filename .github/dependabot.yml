@@ -1,0 +1,51 @@
+# Dependabot configuration for Samrat Programming Language
+# https://docs.github.com/en/code-security/dependabot
+
+version: 2
+updates:
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Katmandu"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "chore"
+      prefix-development: "chore"
+      include: "scope"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "GamingOP69"
+    assignees:
+      - "GamingOP69"
+
+  # Python / pip
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Katmandu"
+    labels:
+      - "dependencies"
+      - "python"
+    commit-message:
+      prefix: "chore"
+      prefix-development: "chore"
+      include: "scope"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "GamingOP69"
+    assignees:
+      - "GamingOP69"
+    allow:
+      - dependency-type: "direct"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-patch"]
