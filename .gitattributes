@@ -13,6 +13,7 @@
 *.toml text
 *.cfg text
 *.ini text
+*.reg text
 
 # Binary files
 *.png binary
@@ -20,9 +21,12 @@
 *.ico binary
 *.exe binary
 *.msi binary
+*.dmg binary
+*.deb binary
 
 # Documentation
 *.md diff=markdown
 
 # Linguist overrides
 *.samrat linguist-language=JavaScript linguist-detectable=true
+*.sam linguist-language=JavaScript linguist-detectable=true

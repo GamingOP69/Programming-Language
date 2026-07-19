@@ -1,0 +1,39 @@
+Windows Registry Editor Version 5.00
+
+; Samrat Programming Language File Association
+; Run this file to associate .samrat and .sam files with the Samrat icon
+; Double-click this file and confirm, or run: regedit /s samrat-file-assoc.reg
+
+[HKEY_CLASSES_ROOT\.samrat]
+@="SamratFile"
+"Content Type"="text/plain"
+"PerceivedType"="text"
+
+[HKEY_CLASSES_ROOT\.samrat\OpenWithProgids]
+"SamratFile"=hex(0):
+
+[HKEY_CLASSES_ROOT\.sam]
+@="SamratFile"
+"Content Type"="text/plain"
+"PerceivedType"="text"
+
+[HKEY_CLASSES_ROOT\.sam\OpenWithProgids]
+"SamratFile"=hex(0):
+
+[HKEY_CLASSES_ROOT\SamratFile]
+@="Samrat Source File"
+
+[HKEY_CLASSES_ROOT\SamratFile\DefaultIcon]
+@="\"C:\\Github\\Programming\\samrat\\samrat.ico\",0"
+
+[HKEY_CLASSES_ROOT\SamratFile\shell\open\command]
+@="\"C:\\Github\\Programming\\samrat\\src\\main.py\" \"%1\""
+
+[HKEY_CLASSES_ROOT\SamratFile\shell\run\command]
+@="python \"C:\\Github\\Programming\\samrat\\src\\main.py\" run \"%1\""
+
+[HKEY_CLASSES_ROOT\SamratFile\shell\compile\command]
+@="python \"C:\\Github\\Programming\\samrat\\src\\main.py\" compile \"%1\""
+
+[HKEY_CLASSES_ROOT\SamratFile\shell\edit\command]
+@="notepad.exe \"%1\""
