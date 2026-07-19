@@ -39,30 +39,31 @@ from errors import ParserError
 # Note: Assignment operators (=, +=, etc.) are NOT in this table.
 # They are handled at the statement level in _parse_expression_or_assignment.
 PRECEDENCE = {
-    TokenType.ELVIS: 1,            # ?? (null coalescing)
-    TokenType.OR: 2,               # or
-    TokenType.AND: 3,              # and
-    TokenType.EQUAL_EQUAL: 4,      # ==
-    TokenType.BANG_EQUAL: 4,       # !=
-    TokenType.LESS: 5,             # <
-    TokenType.GREATER: 5,          # >
-    TokenType.LESS_EQUAL: 5,       # <=
-    TokenType.GREATER_EQUAL: 5,    # >=
-    TokenType.PIPE: 6,             # |
-    TokenType.CARET: 7,            # ^
-    TokenType.AMPERSAND: 8,        # &
-    TokenType.LESS_LESS: 9,        # <<
-    TokenType.GREATER_GREATER: 9,  # >>
-    TokenType.PLUS: 10,            # +
-    TokenType.MINUS: 10,           # -
-    TokenType.STAR: 11,            # *
-    TokenType.SLASH: 11,           # /
-    TokenType.PERCENT: 11,         # %
-    TokenType.STAR_STAR: 12,       # **
-    TokenType.PIPE_PIPE: 13,       # |> (pipe operator)
-    TokenType.NOT: 14,             # not (unary)
-    TokenType.TILDE: 14,           # ~ (unary)
-    TokenType.QUESTION: 15,        # ? (ternary)
+    TokenType.DOT_DOT: 1,          # .. (range)
+    TokenType.ELVIS: 2,            # ?? (null coalescing)
+    TokenType.OR: 3,               # or
+    TokenType.AND: 4,              # and
+    TokenType.EQUAL_EQUAL: 5,      # ==
+    TokenType.BANG_EQUAL: 5,       # !=
+    TokenType.LESS: 6,             # <
+    TokenType.GREATER: 6,          # >
+    TokenType.LESS_EQUAL: 6,       # <=
+    TokenType.GREATER_EQUAL: 6,    # >=
+    TokenType.PIPE: 7,             # |
+    TokenType.CARET: 8,            # ^
+    TokenType.AMPERSAND: 9,        # &
+    TokenType.LESS_LESS: 10,       # <<
+    TokenType.GREATER_GREATER: 10, # >>
+    TokenType.PLUS: 11,            # +
+    TokenType.MINUS: 11,           # -
+    TokenType.STAR: 12,            # *
+    TokenType.SLASH: 12,           # /
+    TokenType.PERCENT: 12,         # %
+    TokenType.STAR_STAR: 13,       # **
+    TokenType.PIPE_PIPE: 14,       # |> (pipe operator)
+    TokenType.NOT: 15,             # not (unary)
+    TokenType.TILDE: 15,           # ~ (unary)
+    TokenType.QUESTION: 16,        # ? (ternary)
 }
 
 # Tokens that can start an expression
@@ -555,17 +556,17 @@ class Parser:
 
         # Unary operators
         elif token.type == TokenType.MINUS:
-            operand = self._parse_expression(PRECEDENCE.get(TokenType.MINUS, 14))
+            operand = self._parse_expression(PRECEDENCE.get(TokenType.MINUS, 15))
             return UnaryOp('-', operand, line=token.line, column=token.column)
         elif token.type == TokenType.NOT:
-            operand = self._parse_expression(PRECEDENCE.get(TokenType.NOT, 14))
+            operand = self._parse_expression(PRECEDENCE.get(TokenType.NOT, 15))
             return UnaryOp('not', operand, line=token.line, column=token.column)
         elif token.type == TokenType.TILDE:
-            operand = self._parse_expression(PRECEDENCE.get(TokenType.TILDE, 14))
+            operand = self._parse_expression(PRECEDENCE.get(TokenType.TILDE, 15))
             return UnaryOp('~', operand, line=token.line, column=token.column)
         elif token.type == TokenType.PLUS:
             # Unary plus is a no-op, just parse the operand
-            operand = self._parse_expression(PRECEDENCE.get(TokenType.PLUS, 14))
+            operand = self._parse_expression(PRECEDENCE.get(TokenType.PLUS, 15))
             return operand
 
         self._error(f"Unexpected token: '{token.lexeme}'")
