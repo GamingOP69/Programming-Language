@@ -96,13 +96,12 @@ jobs:
       run: |
         cd src
         pyinstaller --onefile --name samrat main.py
-        pyinstaller --onefile --name samrat-cli cli.py
 
     - name: Upload artifact
       uses: actions/upload-artifact@v7
       with:
         name: release-${{ runner.os }}
-        path: src/dist/*
+        path: src/dist/samrat*
         retention-days: 1
 
   create-release:
@@ -122,9 +121,6 @@ jobs:
         path: artifacts
         pattern: release-*
         merge-multiple: true
-
-    - name: List artifacts
-      run: ls -la artifacts/
 
     - name: Create source archives
       run: |
