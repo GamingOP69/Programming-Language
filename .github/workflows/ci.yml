@@ -40,7 +40,7 @@ jobs:
     - name: Run all tests (combined)
       run: |
         cd tests
-        python -c "import sys, os; sys.path.insert(0, os.path.join('..', 'src')); from test_comprehensive import run_all; from test_compiler import run_all as run_compiler; success1 = run_all(); success2 = run_compiler(); sys.exit(0 if (success1 and success2) else 1)"
+        python run_all.py
 
   # ─── Lint Job — runs on ALL pushes and PRs ────────────────────────────
   lint:
