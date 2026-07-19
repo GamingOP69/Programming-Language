@@ -7,13 +7,13 @@ Usage:
     python main.py <command>     # Run CLI command
 """
 
-import sys
 import os
+import sys
 
 # Add src to path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from cli import main as cli_main
+from cli import main as cli_main  # noqa: E402
 
 
 def main():

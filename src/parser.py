@@ -30,7 +30,7 @@ from ast_nodes import (
     TryStatement, ThrowStatement, ImportStatement,
     Literal, Identifier, BinaryOp, UnaryOp,
     MemberAccess, Subscript, FunctionCall,
-    ArrayLiteral, MapLiteral, RangeLiteral, ThisExpression,
+    ArrayLiteral, MapLiteral, ThisExpression,
 )
 from errors import ParserError
 
@@ -119,7 +119,7 @@ class Parser:
 
     # ─── Statement Parsing ────────────────────────────────────────────────
 
-    def _parse_statement(self):
+    def _parse_statement(self):  # noqa: C901
         """Parse a single statement based on the current token."""
         if self._check(TokenType.LET):
             return self._parse_var_declaration()
@@ -411,27 +411,27 @@ class Parser:
 
         # Check if this is an assignment
         if self._check(TokenType.EQUAL):
-            op_token = self._advance()
+            self._advance()
             value = self._parse_expression()
             return Assignment(expr, value, '=', line=expr.line, column=expr.column)
         elif self._check(TokenType.PLUS_EQUAL):
-            op_token = self._advance()
+            self._advance()
             value = self._parse_expression()
             return Assignment(expr, value, '+=', line=expr.line, column=expr.column)
         elif self._check(TokenType.MINUS_EQUAL):
-            op_token = self._advance()
+            self._advance()
             value = self._parse_expression()
             return Assignment(expr, value, '-=', line=expr.line, column=expr.column)
         elif self._check(TokenType.STAR_EQUAL):
-            op_token = self._advance()
+            self._advance()
             value = self._parse_expression()
             return Assignment(expr, value, '*=', line=expr.line, column=expr.column)
         elif self._check(TokenType.SLASH_EQUAL):
-            op_token = self._advance()
+            self._advance()
             value = self._parse_expression()
             return Assignment(expr, value, '/=', line=expr.line, column=expr.column)
         elif self._check(TokenType.PERCENT_EQUAL):
-            op_token = self._advance()
+            self._advance()
             value = self._parse_expression()
             return Assignment(expr, value, '%=', line=expr.line, column=expr.column)
 
@@ -505,7 +505,7 @@ class Parser:
 
         return expr
 
-    def _parse_primary(self):
+    def _parse_primary(self):  # noqa: C901
         """Parse a primary expression (the highest precedence)."""
         token = self._advance()
 

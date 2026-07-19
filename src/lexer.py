@@ -381,7 +381,6 @@ class Lexer:
         # Consume closing double quote
         self._advance()
 
-        lexeme = self.source[self.start:self.current]
         value = ''.join(string_value)
 
         self._add_token(TokenType.STRING, value)
@@ -412,7 +411,7 @@ class Lexer:
             # This matches the behavior of many languages
             return '\\' + char
 
-    def _handle_operator_or_punctuation(self, char: str) -> None:
+    def _handle_operator_or_punctuation(self, char: str) -> None:  # noqa: C901
         """
         Handle operators and punctuation characters.
 

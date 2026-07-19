@@ -27,7 +27,14 @@ Usage:
         result = interpreter.interpret(ast)
 """
 
-from ast_nodes import *
+from ast_nodes import (
+    Program, ExpressionStatement, Block, VarDeclaration, ConstDeclaration,
+    Assignment, Identifier, MemberAccess, Subscript, ReturnStatement,
+    BreakStatement, ContinueStatement, IfStatement, WhileLoop, ForLoop,
+    FunctionDef, ClassDef, ConstructorDef, TryStatement, ThrowStatement,
+    ImportStatement, Literal, ThisExpression, RangeLiteral, BinaryOp,
+    UnaryOp, FunctionCall, ArrayLiteral, MapLiteral,
+)
 from errors import RuntimeError_, TypeError_
 
 
@@ -414,7 +421,7 @@ class Interpreter:
                 continue
         return result
 
-    def _visit_ForLoop(self, node: ForLoop):
+    def _visit_ForLoop(self, node: ForLoop):  # noqa: C901
         """Execute a for loop."""
         iterable = self._visit(node.iterable)
         result = None
@@ -544,7 +551,7 @@ class Interpreter:
         """Look up and return the identifier's value."""
         return self.environment.get(node.name)
 
-    def _visit_BinaryOp(self, node: BinaryOp):
+    def _visit_BinaryOp(self, node: BinaryOp):  # noqa: C901
         """Evaluate a binary operation."""
         left = self._visit(node.left)
         right = self._visit(node.right)
@@ -553,7 +560,10 @@ class Interpreter:
         # Range operator
         if op == '..':
             if not isinstance(left, int) or not isinstance(right, int):
-                raise RuntimeError_(f"Range requires integer bounds, got {type(left).__name__} and {type(right).__name__}")
+                raise RuntimeError_(
+                    f"Range requires integer bounds, got {type(left).__name__} "
+                    f"and {type(right).__name__}"
+                )
             return range(left, right)
 
         # Arithmetic
@@ -623,7 +633,7 @@ class Interpreter:
 
         raise RuntimeError_(f"Unknown unary operator '{node.operator}'")
 
-    def _visit_MemberAccess(self, node: MemberAccess):
+    def _visit_MemberAccess(self, node: MemberAccess):  # noqa: C901
         """Evaluate member access."""
         obj = self._visit(node.object)
 

@@ -23,22 +23,20 @@ Usage:
     python cli.py version
 """
 
-import sys
 import os
+import sys
 import time
-import shutil
-import argparse
 
 # Add src to path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from lexer import Lexer
-from parser import Parser
-from semantic import SemanticAnalyzer
-from interpreter import Interpreter
-from compiler import Compiler
-from vm import VM
-from errors import LexerError, ParserError, SemanticError, RuntimeError_
+from lexer import Lexer  # noqa: E402
+from parser import Parser  # noqa: E402
+from semantic import SemanticAnalyzer  # noqa: E402
+from interpreter import Interpreter  # noqa: E402
+from compiler import Compiler  # noqa: E402
+from vm import VM  # noqa: E402
+from errors import LexerError, ParserError, RuntimeError_  # noqa: E402
 
 # ─── Constants ─────────────────────────────────────────────────────────────
 
@@ -130,10 +128,10 @@ def run_source(source: str, filename: str = "<stdin>", use_vm: bool = False) -> 
             # Register function chunks
             for name, func_chunk, param_count in compiler.function_chunks:
                 vm._function_chunks[name] = (func_chunk, param_count)
-            result = vm.run(chunk)
+            vm.run(chunk)
         else:
             interpreter = Interpreter()
-            result = interpreter.interpret(ast)
+            interpreter.interpret(ast)
         return True
     except RuntimeError_ as e:
         print(c(f"RuntimeError: {e}", Colors.RED))
@@ -166,7 +164,7 @@ def run_file(path: str, use_vm: bool = False) -> bool:
 
 # ─── REPL ──────────────────────────────────────────────────────────────────
 
-def run_repl(use_vm: bool = False):
+def run_repl(use_vm: bool = False):  # noqa: C901
     """Run the Samrat REPL (Read-Eval-Print-Loop)."""
     banner = [
         c("=" * 50, Colors.CYAN),
@@ -494,7 +492,7 @@ def cmd_fmt(args):
         lexer = Lexer(source)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
-        ast = parser.parse()
+        parser.parse()
     except (LexerError, ParserError) as e:
         print(c(f"Error: Cannot format file with syntax errors: {e}", Colors.RED))
         return 1

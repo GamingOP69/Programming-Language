@@ -47,7 +47,6 @@ def constant_folding(chunk: Chunk) -> Chunk:
         return chunk
 
     # Track which instructions to remove
-    remove_indices = set()
     new_code = []
     new_lines = []
     i = 0
@@ -56,13 +55,23 @@ def constant_folding(chunk: Chunk) -> Chunk:
         opcode, arg = chunk.code[i]
 
         # Look for PUSH_*, PUSH_*, BINARY_OP patterns
-        if (i + 2 < len(chunk.code) and
-            _is_push_op(chunk.code[i][0]) and
-            _is_push_op(chunk.code[i + 1][0]) and
-            _is_foldable_binary(chunk.code[i + 2][0])):
+        if (
+            i + 2 < len(chunk.code)
+            and _is_push_op(chunk.code[i][0])
+            and _is_push_op(chunk.code[i + 1][0])
+            and _is_foldable_binary(chunk.code[i + 2][0])
+        ):
 
-            left_val = chunk.constants[chunk.code[i][1]] if chunk.code[i][1] is not None else _get_push_value(chunk.code[i])
-            right_val = chunk.constants[chunk.code[i + 1][1]] if chunk.code[i + 1][1] is not None else _get_push_value(chunk.code[i + 1])
+            left_val = (
+                chunk.constants[chunk.code[i][1]]
+                if chunk.code[i][1] is not None
+                else _get_push_value(chunk.code[i])
+            )
+            right_val = (
+                chunk.constants[chunk.code[i + 1][1]]
+                if chunk.code[i + 1][1] is not None
+                else _get_push_value(chunk.code[i + 1])
+            )
             binary_op = chunk.code[i + 2][0]
             line = chunk.lines[i]
 
@@ -101,9 +110,11 @@ def constant_folding(chunk: Chunk) -> Chunk:
                 continue
             else:
                 # Can't fold with unary negation: PUSH_*, NEG
-                if (i + 1 < len(chunk.code) and
-                    _is_push_op(chunk.code[i][0]) and
-                    chunk.code[i + 1][0] == OpCode.NEG):
+                if (
+                    i + 1 < len(chunk.code)
+                    and _is_push_op(chunk.code[i][0])
+                    and chunk.code[i + 1][0] == OpCode.NEG
+                ):
                     val = _get_push_value(chunk.code[i])
                     line = chunk.lines[i]
                     if isinstance(val, (int, float)):
@@ -120,9 +131,11 @@ def constant_folding(chunk: Chunk) -> Chunk:
                         continue
 
         # Look for NOT + PUSH patterns
-        if (i + 1 < len(chunk.code) and
-            chunk.code[i][0] == OpCode.NOT and
-            _is_push_op(chunk.code[i + 1][0])):
+        if (
+            i + 1 < len(chunk.code)
+            and chunk.code[i][0] == OpCode.NOT
+            and _is_push_op(chunk.code[i + 1][0])
+        ):
             val = _get_push_value(chunk.code[i + 1])
             line = chunk.lines[i]
             if isinstance(val, bool):
@@ -173,7 +186,7 @@ def _is_foldable_binary(opcode: OpCode) -> bool:
                       OpCode.SHL, OpCode.SHR)
 
 
-def _fold_constants(left, right, opcode):
+def _fold_constants(left, right, opcode):  # noqa: C901
     """Fold two constant values with a binary operation."""
     try:
         if opcode == OpCode.ADD:
@@ -250,7 +263,6 @@ def dead_code_elimination(chunk: Chunk) -> Chunk:
 
         # Unconditional jumps: code after jump is unreachable (unless it's a jump target)
         if opcode == OpCode.JMP:
-            target = arg
             # Only mark as unreachable if there are no other jumps to the next instruction
             j = i + 1
             while j < len(chunk.code):
@@ -296,16 +308,20 @@ def peephole_optimization(chunk: Chunk) -> Chunk:
         line = chunk.lines[i] if i < len(chunk.lines) else 0
 
         # PUSH_* followed immediately by POP: remove both
-        if (i + 1 < len(chunk.code) and
-            _is_push_op(opcode) and
-            chunk.code[i + 1][0] == OpCode.POP):
+        if (
+            i + 1 < len(chunk.code)
+            and _is_push_op(opcode)
+            and chunk.code[i + 1][0] == OpCode.POP
+        ):
             i += 2
             continue
 
         # DUP followed by POP: remove both
-        if (opcode == OpCode.DUP and
-            i + 1 < len(chunk.code) and
-            chunk.code[i + 1][0] == OpCode.POP):
+        if (
+            opcode == OpCode.DUP
+            and i + 1 < len(chunk.code)
+            and chunk.code[i + 1][0] == OpCode.POP
+        ):
             i += 2
             continue
 
@@ -319,8 +335,10 @@ def peephole_optimization(chunk: Chunk) -> Chunk:
             target = arg
             # Follow the chain
             seen = set()
-            while (target < len(chunk.code) and
-                   chunk.code[target][0] == OpCode.JMP):
+            while (
+                target < len(chunk.code)
+                and chunk.code[target][0] == OpCode.JMP
+            ):
                 if target in seen:
                     break  # Cycle detected
                 seen.add(target)
@@ -334,16 +352,20 @@ def peephole_optimization(chunk: Chunk) -> Chunk:
             continue
 
         # NOT + NOT: remove both
-        if (opcode == OpCode.NOT and
-            i + 1 < len(chunk.code) and
-            chunk.code[i + 1][0] == OpCode.NOT):
+        if (
+            opcode == OpCode.NOT
+            and i + 1 < len(chunk.code)
+            and chunk.code[i + 1][0] == OpCode.NOT
+        ):
             i += 2
             continue
 
         # NEG + NEG: remove both (double negation)
-        if (opcode == OpCode.NEG and
-            i + 1 < len(chunk.code) and
-            chunk.code[i + 1][0] == OpCode.NEG):
+        if (
+            opcode == OpCode.NEG
+            and i + 1 < len(chunk.code)
+            and chunk.code[i + 1][0] == OpCode.NEG
+        ):
             i += 2
             continue
 
@@ -382,10 +404,18 @@ def strength_reduction(chunk: Chunk) -> Chunk:
         line = chunk.lines[i] if i < len(chunk.lines) else 0
 
         # Look for: PUSH_INT(n), PUSH_INT(m), <BIN_OP>
-        if (i + 2 < len(chunk.code) and
-            (chunk.code[i][0] == OpCode.PUSH_INT or chunk.code[i][0] == OpCode.PUSH_FLOAT) and
-            (chunk.code[i + 1][0] == OpCode.PUSH_INT or chunk.code[i + 1][0] == OpCode.PUSH_FLOAT) and
-            chunk.code[i + 2][0] in (OpCode.MUL, OpCode.POW, OpCode.ADD, OpCode.SUB)):
+        if (
+            i + 2 < len(chunk.code)
+            and (
+                chunk.code[i][0] == OpCode.PUSH_INT
+                or chunk.code[i][0] == OpCode.PUSH_FLOAT
+            )
+            and (
+                chunk.code[i + 1][0] == OpCode.PUSH_INT
+                or chunk.code[i + 1][0] == OpCode.PUSH_FLOAT
+            )
+            and chunk.code[i + 2][0] in (OpCode.MUL, OpCode.POW, OpCode.ADD, OpCode.SUB)
+        ):
 
             left_const_idx = chunk.code[i][1]
             right_const_idx = chunk.code[i + 1][1]
@@ -419,11 +449,9 @@ def strength_reduction(chunk: Chunk) -> Chunk:
 
             # x * 0 -> 0
             if bin_op == OpCode.MUL and (left_val == 0 or right_val == 0):
-                new_code.append((OpCode.PUSH_INT, 0 if isinstance(left_val, int) or isinstance(right_val, int) else 0))
-                new_lines.append(line)
-                # Fix: need to add constant
                 zero_idx = chunk.add_constant(0)
-                new_code[-1] = (OpCode.PUSH_INT, zero_idx)
+                new_code.append((OpCode.PUSH_INT, zero_idx))
+                new_lines.append(line)
                 i += 3
                 continue
 

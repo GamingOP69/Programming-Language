@@ -12,7 +12,14 @@ Usage:
 """
 
 from bytecode import OpCode, Chunk
-from ast_nodes import *
+from ast_nodes import (
+    Program, ExpressionStatement, Block, VarDeclaration, ConstDeclaration,
+    Assignment, Identifier, Subscript, MemberAccess, ReturnStatement,
+    BreakStatement, ContinueStatement, IfStatement, WhileLoop, ForLoop,
+    FunctionDef, ClassDef, TryStatement, ThrowStatement, ImportStatement,
+    Literal, ThisExpression, RangeLiteral, BinaryOp, UnaryOp, FunctionCall,
+    ArrayLiteral, MapLiteral,
+)
 
 
 class Compiler:
@@ -215,7 +222,6 @@ class Compiler:
         self.chunk.emit(OpCode.JMP_IF_FALSE, 0, self.current_line)
         exit_jump = len(self.chunk.code) - 1
 
-        loop_end = len(self.chunk.code)  # After the loop body
         self.loop_stack.append((loop_start, 0, loop_start))  # continue goes to condition
 
         self._visit(node.body)

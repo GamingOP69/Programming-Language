@@ -14,19 +14,19 @@ class TokenType(Enum):
     """All possible token types in the Samrat language."""
 
     # Literals
-    INTEGER = auto()       # 42, 0xFF, 0b1010
-    FLOAT = auto()         # 3.14, 1e10
-    STRING = auto()        # "hello"
-    TRUE = auto()          # true
-    FALSE = auto()         # false
-    NULL = auto()          # null
+    INTEGER = auto()  # 42, 0xFF, 0b1010
+    FLOAT = auto()  # 3.14, 1e10
+    STRING = auto()  # "hello"
+    TRUE = auto()  # true
+    FALSE = auto()  # false
+    NULL = auto()  # null
 
     # Identifiers
-    IDENTIFIER = auto()    # variable names, function names, etc.
+    IDENTIFIER = auto()  # variable names, function names, etc.
 
     # Keywords
-    LET = auto()           # let
-    CONST = auto()         # const
+    LET = auto()  # let
+    CONST = auto()  # const
     FUNC = auto()          # func
     RETURN = auto()        # return
     IF = auto()            # if
@@ -57,56 +57,56 @@ class TokenType(Enum):
     VOID = auto()          # void (type keyword)
     MATCH = auto()         # match (reserved for future)
     CASE = auto()          # case (reserved for future)
-    DEFAULT = auto()       # default (reserved for future)
+    DEFAULT = auto()  # default (reserved for future)
 
     # Operators
-    PLUS = auto()          # +
-    MINUS = auto()         # -
-    STAR = auto()          # *
-    SLASH = auto()         # /
-    PERCENT = auto()       # %
-    STAR_STAR = auto()     # ** (exponentiation)
-    EQUAL_EQUAL = auto()   # ==
-    BANG_EQUAL = auto()    # !=
-    LESS = auto()          # <
-    GREATER = auto()       # >
-    LESS_EQUAL = auto()    # <=
-    GREATER_EQUAL = auto() # >=
-    EQUAL = auto()         # =
-    PLUS_EQUAL = auto()    # +=
-    MINUS_EQUAL = auto()   # -=
-    STAR_EQUAL = auto()    # *=
-    SLASH_EQUAL = auto()   # /=
-    PERCENT_EQUAL = auto() # %=
-    AMPERSAND = auto()     # &
-    PIPE = auto()          # |
-    CARET = auto()         # ^
-    TILDE = auto()         # ~
-    LESS_LESS = auto()     # <<
-    GREATER_GREATER = auto() # >>
-    DOT = auto()           # .
-    COMMA = auto()         # ,
-    COLON = auto()         # :
-    SEMICOLON = auto()     # ;
-    ARROW = auto()         # ->
-    DOT_DOT = auto()       # .. (range)
+    PLUS = auto()  # +
+    MINUS = auto()  # -
+    STAR = auto()  # *
+    SLASH = auto()  # /
+    PERCENT = auto()  # %
+    STAR_STAR = auto()  # ** (exponentiation)
+    EQUAL_EQUAL = auto()  # ==
+    BANG_EQUAL = auto()  # !=
+    LESS = auto()  # <
+    GREATER = auto()  # >
+    LESS_EQUAL = auto()  # <=
+    GREATER_EQUAL = auto()  # >=
+    EQUAL = auto()  # =
+    PLUS_EQUAL = auto()  # +=
+    MINUS_EQUAL = auto()  # -=
+    STAR_EQUAL = auto()  # *=
+    SLASH_EQUAL = auto()  # /=
+    PERCENT_EQUAL = auto()  # %=
+    AMPERSAND = auto()  # &
+    PIPE = auto()  # |
+    CARET = auto()  # ^
+    TILDE = auto()  # ~
+    LESS_LESS = auto()  # <<
+    GREATER_GREATER = auto()  # >>
+    DOT = auto()  # .
+    COMMA = auto()  # ,
+    COLON = auto()  # :
+    SEMICOLON = auto()  # ;
+    ARROW = auto()  # ->
+    DOT_DOT = auto()  # .. (range)
 
     # Punctuation
-    LEFT_PAREN = auto()    # (
-    RIGHT_PAREN = auto()   # )
+    LEFT_PAREN = auto()  # (
+    RIGHT_PAREN = auto()  # )
     LEFT_BRACKET = auto()  # [
-    RIGHT_BRACKET = auto() # ]
-    LEFT_BRACE = auto()    # {
-    RIGHT_BRACE = auto()   # }
+    RIGHT_BRACKET = auto()  # ]
+    LEFT_BRACE = auto()  # {
+    RIGHT_BRACE = auto()  # }
 
     # Special
-    EOF = auto()           # End of file
-    NEWLINE = auto()       # Newline (significant for statement separation)
-    INDENT = auto()        # Indentation (not used in brace-based syntax, reserved)
-    DEDENT = auto()        # Dedentation (not used in brace-based syntax, reserved)
+    EOF = auto()  # End of file
+    NEWLINE = auto()  # Newline (significant for statement separation)
+    INDENT = auto()  # Indentation (not used in brace-based syntax, reserved)
+    DEDENT = auto()  # Dedentation (not used in brace-based syntax, reserved)
 
     # Error
-    ERROR = auto()         # Lexer error token
+    ERROR = auto()  # Lexer error token
 
 
 # Mapping of keyword strings to their token types

@@ -101,7 +101,7 @@ class VM:
             return self.stack[-1]
         return None
 
-    def _execute(self, opcode: OpCode, arg):
+    def _execute(self, opcode: OpCode, arg):  # noqa: C901
         """Execute a single instruction."""
 
         # ─── Stack Operations ──────────────────────────────────────────

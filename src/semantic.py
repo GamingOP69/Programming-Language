@@ -29,8 +29,15 @@ Usage:
     analyzer.analyze(ast)
 """
 
-from ast_nodes import *
-from symbol_table import SymbolTable, Symbol
+from ast_nodes import (
+    Program, ExpressionStatement, Block, VarDeclaration, ConstDeclaration,
+    Assignment, Identifier, MemberAccess, Subscript, ReturnStatement,
+    BreakStatement, ContinueStatement, FunctionDef, ClassDef,
+    ConstructorDef, IfStatement, WhileLoop, ForLoop, TryStatement,
+    ThrowStatement, ImportStatement, Literal, ThisExpression, RangeLiteral,
+    BinaryOp, UnaryOp, FunctionCall, ArrayLiteral, MapLiteral,
+)
+from symbol_table import SymbolTable
 from errors import SemanticError
 
 
@@ -265,8 +272,11 @@ class SemanticAnalyzer:
             # Allow array/map element assignment
             self._resolve_expression_type(node.target)
         else:
-            self._error(f"Invalid assignment target",
-                        node.line, node.column)
+            self._error(
+                "Invalid assignment target",
+                node.line,
+                node.column,
+            )
 
         self._resolve_expression_type(node.value)
 
@@ -428,7 +438,7 @@ class SemanticAnalyzer:
 
     def _visit_ForLoop(self, node: ForLoop):
         """Analyze for loop."""
-        iter_type = self._resolve_expression_type(node.iterable)
+        self._resolve_expression_type(node.iterable)
 
         self.loop_depth += 1
         self.symbol_table.enter_scope('block')
@@ -496,7 +506,7 @@ class SemanticAnalyzer:
             return None
         return symbol.symbol_type
 
-    def _resolve_BinaryOp(self, node: BinaryOp) -> str:
+    def _resolve_BinaryOp(self, node: BinaryOp) -> str:  # noqa: C901
         """Resolve binary operation result type."""
         left_type = self._resolve_expression_type(node.left)
         right_type = self._resolve_expression_type(node.right)
@@ -653,8 +663,13 @@ class SemanticAnalyzer:
             if name in builtin_arg_counts:
                 min_args, max_args = builtin_arg_counts[name]
                 if len(node.arguments) < min_args:
-                    self._error(f"Function '{name}' expects at least {min_args} argument(s), "
-                                f"got {len(node.arguments)}", node.line, node.column)
+                    self._error(
+                        "Function '{}' expects at least {} argument(s), got {}".format(
+                            name, min_args, len(node.arguments)
+                        ),
+                        node.line,
+                        node.column,
+                    )
                 elif max_args is not None and len(node.arguments) > max_args:
                     self._error(f"Function '{name}' expects at most {max_args} argument(s), "
                                 f"got {len(node.arguments)}", node.line, node.column)
