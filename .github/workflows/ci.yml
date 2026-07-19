@@ -71,13 +71,15 @@ jobs:
       run: |
         bandit -r src/ -f json -o security-report.json || true
 
-  release:
-    name: Release ${{ github.ref_name }}
+  release-build:
+    name: Build (${{ matrix.os }})
     needs: [test, lint, security]
     if: startsWith(github.ref, 'refs/tags/v')
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
 
     steps:
     - uses: actions/checkout@v7
@@ -87,27 +89,54 @@ jobs:
       with:
         python-version: '3.12'
 
-    - name: Build executables
+    - name: Install PyInstaller
+      run: python -m pip install pyinstaller
+
+    - name: Build executable
       run: |
-        python -m pip install pyinstaller
         cd src
         pyinstaller --onefile --name samrat main.py
         pyinstaller --onefile --name samrat-cli cli.py
 
+    - name: Upload artifact
+      uses: actions/upload-artifact@v7
+      with:
+        name: release-${{ runner.os }}
+        path: src/dist/*
+        retention-days: 1
+
+  create-release:
+    name: Release ${{ github.ref_name }}
+    needs: [release-build]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+    - uses: actions/checkout@v7
+
+    - name: Download all release artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+        pattern: release-*
+        merge-multiple: true
+
+    - name: List artifacts
+      run: ls -la artifacts/
+
     - name: Create source archives
       run: |
-        mkdir -p artifacts
-        mv src/dist/samrat artifacts/
-        mv src/dist/samrat-cli artifacts/
-        cd artifacts
-        tar -czf ../samrat-source.tar.gz --exclude='samrat-source.tar.gz' --exclude='samrat-source.zip' -C .. .
-        cd ..
-        zip -r samrat-source.zip . -x '.git/*' '__pycache__/*' '*.pyc' 'artifacts/*'
+        tar -czf /tmp/samrat-source.tar.gz --exclude='.git' --exclude='__pycache__' --exclude='*.pyc' --exclude='artifacts' .
+        cp /tmp/samrat-source.tar.gz .
+        zip -r /tmp/samrat-source.zip . -x '.git/*' '__pycache__/*' '*.pyc' 'artifacts/*'
+        cp /tmp/samrat-source.zip .
 
     - name: Generate checksums
       run: |
         cd artifacts
-        sha256sum samrat samrat-cli > ../checksums.txt
+        sha256sum * > ../checksums.txt
         cd ..
         sha256sum samrat-source.tar.gz samrat-source.zip >> checksums.txt
 
@@ -119,8 +148,7 @@ jobs:
         draft: false
         prerelease: false
         files: |
-          artifacts/samrat
-          artifacts/samrat-cli
+          artifacts/*
           samrat-source.tar.gz
           samrat-source.zip
           checksums.txt
