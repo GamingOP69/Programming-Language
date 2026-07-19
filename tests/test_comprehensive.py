@@ -8,10 +8,18 @@ valid programs, invalid programs, edge cases, and stress tests.
 import sys
 import os
 import time
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+import importlib.util
+
+src_path = os.path.join(os.path.dirname(__file__), '..', 'src')
+sys.path.insert(0, src_path)
+
+# Load parser module explicitly from file to avoid built-in parser conflict
+parser_spec = importlib.util.spec_from_file_location('samrat_parser', os.path.join(src_path, 'parser.py'))
+parser_module = importlib.util.module_from_spec(parser_spec)
+parser_spec.loader.exec_module(parser_module)
+Parser = parser_module.Parser
 
 from lexer import Lexer
-from parser import Parser  # noqa: E402 (local parser module, not stdlib)
 from semantic import SemanticAnalyzer
 from interpreter import Interpreter
 from tokens import Token, TokenType, KEYWORDS
