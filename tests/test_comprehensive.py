@@ -11,7 +11,7 @@ import time
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
 from lexer import Lexer
-from parser import Parser
+from parser import Parser  # noqa: E402 (local parser module, not stdlib)
 from semantic import SemanticAnalyzer
 from interpreter import Interpreter
 from tokens import Token, TokenType, KEYWORDS
@@ -1509,10 +1509,10 @@ def run_all():
             try:
                 getattr(instance, method_name)()
                 passed += 1
-                print(f"  ✓ {method_name}")
+                print(f"  [PASS] {method_name}")
             except Exception as e:
                 failed += 1
-                print(f"  ✗ {method_name}: {e}")
+                print(f"  [FAIL] {method_name}: {e}")
 
     print()
     print("=" * 60)
