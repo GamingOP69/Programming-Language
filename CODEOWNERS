@@ -1,0 +1,19 @@
+# Each line is a file pattern followed by one or more owners.
+# These owners will be the default owners for everything in the repo.
+
+* @GamingOP69
+
+# Source code
+/src/ @GamingOP69
+
+# Tests
+/tests/ @GamingOP69
+
+# Documentation
+/docs/ @GamingOP69
+
+# Configuration files
+/.github/ @GamingOP69
+/.gitignore @GamingOP69
+/.gitattributes @GamingOP69
+/.editorconfig @GamingOP69

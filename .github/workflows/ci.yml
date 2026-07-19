@@ -1,0 +1,205 @@
+name: Samrat CI/CD
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # ─── Test Job ──────────────────────────────────────────────────────────
+  test:
+    name: Test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller  # For packaging tests
+
+    - name: Run comprehensive tests
+      run: |
+        cd tests
+        python test_comprehensive.py
+
+    - name: Run compiler tests
+      run: |
+        cd tests
+        python test_compiler.py
+
+    - name: Run all tests
+      run: |
+        cd tests
+        python -c "
+import sys, os
+sys.path.insert(0, os.path.join('..', 'src'))
+from test_comprehensive import run_all
+from test_compiler import run_all as run_compiler
+success1 = run_all()
+success2 = run_compiler()
+sys.exit(0 if (success1 and success2) else 1)
+"
+
+  # ─── Lint Job ──────────────────────────────────────────────────────────
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Install linters
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8
+
+    - name: Lint with flake8
+      run: |
+        flake8 src/ --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 src/ --count --max-complexity=15 --max-line-length=120 --statistics
+
+  # ─── Build Job ─────────────────────────────────────────────────────────
+  build:
+    name: Build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Install PyInstaller
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller
+
+    - name: Build executable
+      run: |
+        cd src
+        pyinstaller --onefile --name samrat main.py
+        # Also build CLI
+        pyinstaller --onefile --name samrat-cli cli.py
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: samrat-${{ matrix.os }}
+        path: |
+          src/dist/samrat*
+          src/dist/samrat-cli*
+
+  # ─── Release Job ───────────────────────────────────────────────────────
+  release:
+    name: Release
+    needs: [test, lint, build]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller
+
+    - name: Build all platforms
+      run: |
+        # Build for Linux
+        cd src
+        pyinstaller --onefile --name samrat-linux main.py
+        pyinstaller --onefile --name samrat-cli-linux cli.py
+        mv dist/samrat-linux ../samrat-linux
+        mv dist/samrat-cli-linux ../samrat-cli-linux
+
+    - name: Create source archives
+      run: |
+        # Create source tarball
+        tar -czf samrat-source.tar.gz \
+          --exclude='__pycache__' \
+          --exclude='.git' \
+          --exclude='dist' \
+          --exclude='build' \
+          --exclude='*.pyc' \
+          .
+        # Create source zip
+        zip -r samrat-source.zip . \
+          -x '__pycache__/*' '.git/*' 'dist/*' 'build/*' '*.pyc'
+
+    - name: Generate checksums
+      run: |
+        sha256sum samrat-linux samrat-cli-linux samrat-source.tar.gz samrat-source.zip > checksums.txt
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        name: Samrat ${{ github.ref_name }}
+        body_path: CHANGELOG.md
+        draft: false
+        prerelease: false
+        files: |
+          samrat-linux
+          samrat-cli-linux
+          samrat-source.tar.gz
+          samrat-source.zip
+          checksums.txt
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ─── Security Scan ─────────────────────────────────────────────────────
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Install bandit
+      run: |
+        python -m pip install --upgrade pip
+        pip install bandit
+
+    - name: Security scan
+      run: |
+        bandit -r src/ -f json -o security-report.json || true
+
+    - name: Upload security report
+      uses: actions/upload-artifact@v4
+      with:
+        name: security-report
+        path: security-report.json

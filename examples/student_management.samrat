@@ -1,0 +1,64 @@
+// Samrat Student Management
+class Student {
+    let name: str
+    let age: int
+    let grades: [int]
+
+    constructor(name: str, age: int) {
+        this.name = name
+        this.age = age
+        this.grades = []
+    }
+
+    func add_grade(grade: int) {
+        this.grades.append(grade)
+    }
+
+    func average_grade() -> float {
+        if len(this.grades) == 0 {
+            return 0.0
+        }
+        let sum = 0
+        for grade in this.grades {
+            sum = sum + grade
+        }
+        return sum / len(this.grades)
+    }
+
+    func has_passed() -> bool {
+        return this.average_grade() >= 60.0
+    }
+
+    func display() {
+        print("Student: " + this.name + ", Age: " + str(this.age))
+        print("  Grades: " + str(this.grades))
+        print("  Average: " + str(this.average_grade()))
+        if this.has_passed() {
+            print("  Status: Passed")
+        } else {
+            print("  Status: Failed")
+        }
+    }
+}
+
+let students = [
+    Student("Alice", 20),
+    Student("Bob", 22),
+    Student("Charlie", 21)
+]
+
+students[0].add_grade(85)
+students[0].add_grade(90)
+students[0].add_grade(78)
+
+students[1].add_grade(55)
+students[1].add_grade(60)
+
+students[2].add_grade(95)
+students[2].add_grade(88)
+students[2].add_grade(92)
+
+for student in students {
+    student.display()
+    print("")
+}

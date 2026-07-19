@@ -1,0 +1,19 @@
+// Samrat File I/O
+let filename = "_test_output.txt"
+
+let out = open(filename, "w")
+out.write("Hello, File!")
+out.write("\nLine 2")
+out.close()
+
+let f = open(filename, "r")
+let content = f.read()
+print("File content:")
+print(content)
+f.close()
+
+// Clean up
+let clean = open(filename, "w")
+clean.write("")
+clean.close()
+print("File I/O completed successfully!")

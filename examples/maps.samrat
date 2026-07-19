@@ -1,0 +1,16 @@
+// Samrat Maps
+let scores: {str: int} = {"Alice": 95, "Bob": 87}
+print("Alice score: " + str(scores["Alice"]))
+print("Bob score: " + str(scores["Bob"]))
+
+scores["Charlie"] = 92
+scores["Alice"] = 98
+
+print("All keys: " + str(scores.keys()))
+print("All values: " + str(scores.values()))
+print("Contains David? " + str(scores.contains("David")))
+print("Contains Alice? " + str(scores.contains("Alice")))
+
+for name in scores.keys() {
+    print(name + ": " + str(scores[name]))
+}

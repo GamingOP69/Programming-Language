@@ -1,0 +1,62 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Build artifacts
+*.exe
+*.msi
+*.dmg
+*.deb
+*.rpm
+*.AppImage
+samrat.spec
+
+# Distribution
+dist/
+build/
+*.zip
+*.tar.gz
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+coverage/
+
+# Documentation
+docs/_build/
+docs/.vitepress/dist/
+
+# Logs
+*.log
+samrat.log
+
+# Environment
+.env
+.env.local
+.env.production
+
+# OS files
+Thumbs.db
+Desktop.ini

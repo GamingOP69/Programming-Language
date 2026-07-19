@@ -1,0 +1,41 @@
+// Samrat Calculator
+func add(a: int, b: int) -> int {
+    return a + b
+}
+
+func subtract(a: int, b: int) -> int {
+    return a - b
+}
+
+func multiply(a: int, b: int) -> int {
+    return a * b
+}
+
+func divide(a: int, b: int) -> int {
+    if b == 0 {
+        throw "Cannot divide by zero"
+    }
+    return a / b
+}
+
+func power(a: int, b: int) -> int {
+    return a ** b
+}
+
+func modulo(a: int, b: int) -> int {
+    return a % b
+}
+
+print("Calculator Demo:")
+print("  10 + 5 = " + str(add(10, 5)))
+print("  10 - 5 = " + str(subtract(10, 5)))
+print("  10 * 5 = " + str(multiply(10, 5)))
+print("  10 / 5 = " + str(divide(10, 5)))
+print("  2 ** 10 = " + str(power(2, 10)))
+print("  17 % 5 = " + str(modulo(17, 5)))
+
+try {
+    print("  10 / 0 = " + str(divide(10, 0)))
+} catch err {
+    print("  10 / 0 => Error: " + err)
+}

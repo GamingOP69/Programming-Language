@@ -1,0 +1,23 @@
+// Samrat Number Guessing Game
+import math
+
+func play_game() {
+    let target = 42
+    let max_guesses = 7
+
+    print("I'm thinking of a number between 1 and 100.")
+    print("You have " + str(max_guesses) + " guesses.")
+
+    let guess = 42
+    print("Your guess: 42")
+
+    if guess == target {
+        print("Correct! You win!")
+    } elif guess < target {
+        print("Too low!")
+    } else {
+        print("Too high!")
+    }
+}
+
+play_game()

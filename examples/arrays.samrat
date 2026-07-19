@@ -1,0 +1,28 @@
+// Samrat Arrays
+let arr = [3, 1, 4, 1, 5, 9, 2, 6]
+print("Original: " + str(arr))
+print("Length: " + str(len(arr)))
+print("First element: " + str(arr[0]))
+print("Last element: " + str(arr[len(arr) - 1]))
+
+arr.append(7)
+print("After append: " + str(arr))
+
+let last = arr.pop()
+print("Popped: " + str(last))
+print("After pop: " + str(arr))
+
+arr.insert(0, 99)
+print("After insert: " + str(arr))
+
+arr.remove(0)
+print("After remove: " + str(arr))
+
+arr.sort()
+print("Sorted: " + str(arr))
+
+arr.reverse()
+print("Reversed: " + str(arr))
+
+print("Contains 5? " + str(arr.contains(5)))
+print("Contains 100? " + str(arr.contains(100)))

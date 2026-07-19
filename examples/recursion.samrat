@@ -1,0 +1,21 @@
+// Samrat Recursion
+func factorial(n: int) -> int {
+    if n <= 1 {
+        return 1
+    }
+    return n * factorial(n - 1)
+}
+
+func fibonacci(n: int) -> int {
+    if n <= 1 {
+        return n
+    }
+    return fibonacci(n - 1) + fibonacci(n - 2)
+}
+
+print("Factorial of 5: " + str(factorial(5)))
+print("Factorial of 10: " + str(factorial(10)))
+print("Fibonacci sequence:")
+for i in 0..10 {
+    print("  fib(" + str(i) + ") = " + str(fibonacci(i)))
+}

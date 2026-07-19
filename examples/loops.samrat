@@ -1,0 +1,29 @@
+// Samrat Loops
+print("While loop:")
+let i = 0
+while i < 5 {
+    print("  i = " + str(i))
+    i = i + 1
+}
+
+print("For range loop:")
+for j in 0..5 {
+    print("  j = " + str(j))
+}
+
+print("For collection loop:")
+let fruits = ["apple", "banana", "cherry"]
+for fruit in fruits {
+    print("  fruit: " + fruit)
+}
+
+print("Break and continue:")
+for k in 0..10 {
+    if k == 3 {
+        continue
+    }
+    if k == 7 {
+        break
+    }
+    print("  k = " + str(k))
+}

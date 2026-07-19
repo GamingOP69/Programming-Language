@@ -1,0 +1,28 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Source files
+*.py text diff=python
+*.samrat text
+*.sam text
+*.md text
+*.txt text
+*.json text
+*.yml text
+*.yaml text
+*.toml text
+*.cfg text
+*.ini text
+
+# Binary files
+*.png binary
+*.jpg binary
+*.ico binary
+*.exe binary
+*.msi binary
+
+# Documentation
+*.md diff=markdown
+
+# Linguist overrides
+*.samrat linguist-language=JavaScript linguist-detectable=true

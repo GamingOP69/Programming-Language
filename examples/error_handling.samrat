@@ -1,0 +1,33 @@
+// Samrat Error Handling
+func divide(a: int, b: int) -> int {
+    if b == 0 {
+        throw "Division by zero"
+    }
+    return a / b
+}
+
+try {
+    let result = divide(10, 2)
+    print("10 / 2 = " + str(result))
+} catch err {
+    print("Error: " + err)
+}
+
+try {
+    let result = divide(10, 0)
+    print("This won't print")
+} catch err {
+    print("Caught: " + err)
+}
+
+func safe_divide(a: int, b: int) -> int {
+    try {
+        return divide(a, b)
+    } catch err {
+        print("Division failed: " + err)
+        return 0
+    }
+}
+
+print("safe_divide(5, 0) = " + str(safe_divide(5, 0)))
+print("safe_divide(10, 2) = " + str(safe_divide(10, 2)))

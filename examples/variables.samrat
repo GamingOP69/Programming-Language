@@ -1,0 +1,32 @@
+// Samrat Variables and Constants
+// Demonstrates let, const, type annotations, reassignment, and scope
+
+// Variable declaration with type inference
+let name = "Samrat"
+let count = 42
+let price = 99.99
+
+// Variable declaration with explicit type
+let is_active: bool = true
+let score: int = 0
+
+// Constants (cannot be reassigned)
+const PI = 3.14159
+const APP_NAME = "Samrat Language"
+
+// Reassignment
+count = 100
+name = "Samrat v2.0"
+
+// Block scope
+let x = 10
+{
+    let y = 20
+    print("Inside block: x = " + str(x) + ", y = " + str(y))
+}
+// y is not accessible here (would cause compile error)
+
+print("Name: " + name)
+print("Count: " + str(count))
+print("PI: " + str(PI))
+print("Score: " + str(score))

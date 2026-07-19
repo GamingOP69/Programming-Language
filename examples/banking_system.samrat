@@ -1,0 +1,49 @@
+// Samrat Banking System
+class Account {
+    let owner: str
+    let balance: float
+
+    constructor(owner: str, initial_balance: float) {
+        this.owner = owner
+        this.balance = initial_balance
+    }
+
+    func deposit(amount: float) {
+        if amount <= 0 {
+            throw "Deposit amount must be positive"
+        }
+        this.balance = this.balance + amount
+        print("Deposited $" + str(amount) + ". New balance: $" + str(this.balance))
+    }
+
+    func withdraw(amount: float) {
+        if amount <= 0 {
+            throw "Withdrawal amount must be positive"
+        }
+        if amount > this.balance {
+            throw "Insufficient funds"
+        }
+        this.balance = this.balance - amount
+        print("Withdrew $" + str(amount) + ". New balance: $" + str(this.balance))
+    }
+
+    func get_balance() -> float {
+        return this.balance
+    }
+
+    func display() {
+        print("Account: " + this.owner + ", Balance: $" + str(this.balance))
+    }
+}
+
+let acc = Account("Alice", 1000.0)
+acc.display()
+acc.deposit(500.0)
+acc.withdraw(200.0)
+print("Final balance: $" + str(acc.get_balance()))
+
+try {
+    acc.withdraw(2000.0)
+} catch err {
+    print("Error: " + err)
+}

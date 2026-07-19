@@ -1,0 +1,33 @@
+// Samrat Text Analyzer
+func analyze_text(text: str) {
+    let char_count = len(text)
+    let lines = 1
+    let word_count = 0
+    let in_word = false
+
+    for i in 0..char_count {
+        let ch = text[i]
+        if ch == "\n" {
+            lines = lines + 1
+        }
+        if ch != " " and ch != "\n" and ch != "\t" {
+            if not in_word {
+                word_count = word_count + 1
+                in_word = true
+            }
+        } else {
+            in_word = false
+        }
+    }
+
+    print("Text Analysis:")
+    print("  Characters: " + str(char_count))
+    print("  Words: " + str(word_count))
+    print("  Lines: " + str(lines))
+}
+
+let sample = "Hello World\nThis is a test\nSamrat rocks!"
+print("Sample text:")
+print(sample)
+print("")
+analyze_text(sample)

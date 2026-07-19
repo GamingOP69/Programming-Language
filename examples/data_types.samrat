@@ -1,0 +1,27 @@
+// Samrat Data Types
+let age: int = 25
+let price: float = 19.99
+let name: str = "Alice"
+let is_ready: bool = true
+
+// Integer formats
+let dec = 42
+let hex = 0xFF
+let bin = 0b1010
+let oct = 0o77
+
+// Arrays
+let numbers: [int] = [1, 2, 3, 4, 5]
+let names: [str] = ["Alice", "Bob", "Charlie"]
+
+// Maps
+let scores: {str: int} = {"Alice": 95, "Bob": 87}
+
+print("int: " + str(age))
+print("float: " + str(price))
+print("str: " + name)
+print("bool: " + str(is_ready))
+print("hex 0xFF = " + str(hex))
+print("bin 0b1010 = " + str(bin))
+print("First number: " + str(numbers[0]))
+print("Alice score: " + str(scores["Alice"]))

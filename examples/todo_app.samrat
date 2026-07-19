@@ -1,0 +1,47 @@
+// Samrat Todo App
+class TodoList {
+    let tasks: [str]
+
+    constructor() {
+        this.tasks = []
+    }
+
+    func add(task: str) {
+        this.tasks.append(task)
+        print("Added: \"" + task + "\"")
+    }
+
+    func remove(index: int) {
+        if index >= 0 and index < len(this.tasks) {
+            let removed = this.tasks[index]
+            this.tasks.remove(index)
+            print("Removed: \"" + removed + "\"")
+        } else {
+            print("Invalid index: " + str(index))
+        }
+    }
+
+    func list() {
+        if len(this.tasks) == 0 {
+            print("No tasks.")
+        } else {
+            print("Tasks:")
+            for i in 0..len(this.tasks) {
+                print("  " + str(i + 1) + ". " + this.tasks[i])
+            }
+        }
+    }
+
+    func count() -> int {
+        return len(this.tasks)
+    }
+}
+
+let todo = TodoList()
+todo.add("Learn Samrat")
+todo.add("Build something awesome")
+todo.add("Write tests")
+todo.list()
+print("Total tasks: " + str(todo.count()))
+todo.remove(1)
+todo.list()
