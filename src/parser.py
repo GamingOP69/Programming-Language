@@ -53,7 +53,7 @@ PRECEDENCE = {
     TokenType.CARET: 8,            # ^
     TokenType.AMPERSAND: 9,        # &
     TokenType.LESS_LESS: 10,       # <<
-    TokenType.GREATER_GREATER: 10, # >>
+    TokenType.GREATER_GREATER: 10,  # >>
     TokenType.PLUS: 11,            # +
     TokenType.MINUS: 11,           # -
     TokenType.STAR: 12,            # *
