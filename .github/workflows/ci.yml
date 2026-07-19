@@ -96,12 +96,20 @@ jobs:
 
     - name: Create source archives
       run: |
-        tar -czf samrat-source.tar.gz --exclude='.git' --exclude='__pycache__' --exclude='*.pyc' .
-        zip -r samrat-source.zip . -x '.git/*' '__pycache__/*' '*.pyc'
+        mkdir -p artifacts
+        mv src/dist/samrat artifacts/
+        mv src/dist/samrat-cli artifacts/
+        cd artifacts
+        tar -czf ../samrat-source.tar.gz --exclude='samrat-source.tar.gz' --exclude='samrat-source.zip' -C .. .
+        cd ..
+        zip -r samrat-source.zip . -x '.git/*' '__pycache__/*' '*.pyc' 'artifacts/*'
 
     - name: Generate checksums
       run: |
-        sha256sum src/dist/samrat src/dist/samrat-cli samrat-source.tar.gz samrat-source.zip > checksums.txt
+        cd artifacts
+        sha256sum samrat samrat-cli > ../checksums.txt
+        cd ..
+        sha256sum samrat-source.tar.gz samrat-source.zip >> checksums.txt
 
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v3
@@ -111,8 +119,8 @@ jobs:
         draft: false
         prerelease: false
         files: |
-          src/dist/samrat
-          src/dist/samrat-cli
+          artifacts/samrat
+          artifacts/samrat-cli
           samrat-source.tar.gz
           samrat-source.zip
           checksums.txt
