@@ -618,6 +618,19 @@ class Interpreter:
         if op == '>>':
             return left >> right
 
+        # Pipe operator
+        if op == '|>':
+            # Pass left as argument to right (function)
+            if callable(right):
+                return right(left)
+            raise RuntimeError_(f"Pipe operator requires a function on the right, got {type(right).__name__}")
+
+        # Null coalescing
+        if op == '??':
+            if left is not None:
+                return left
+            return right
+
         raise RuntimeError_(f"Unknown operator '{op}'")
 
     def _visit_UnaryOp(self, node: UnaryOp):

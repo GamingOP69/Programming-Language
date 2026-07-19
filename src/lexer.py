@@ -433,9 +433,12 @@ class Lexer:
         elif char == ',':
             self._add_token(TokenType.COMMA)
         elif char == '.':
-            # Could be '.' or '..'
+            # Could be '.', '..', or '...'
             if self._match('.'):
-                self._add_token(TokenType.DOT_DOT)
+                if self._match('.'):
+                    self._add_token(TokenType.DOT_DOT_DOT)
+                else:
+                    self._add_token(TokenType.DOT_DOT)
             else:
                 self._add_token(TokenType.DOT)
         elif char == ':':
@@ -487,6 +490,8 @@ class Lexer:
         elif char == '=':
             if self._match('='):
                 self._add_token(TokenType.EQUAL_EQUAL)
+            elif self._match('>'):
+                self._add_token(TokenType.LAMBDA_ARROW)
             else:
                 self._add_token(TokenType.EQUAL)
         elif char == '!':
@@ -519,8 +524,9 @@ class Lexer:
             else:
                 self._add_token(TokenType.AMPERSAND)
         elif char == '|':
-            if self._match('|'):
-                # || is not a Samrat operator
+            if self._match('>'):
+                self._add_token(TokenType.PIPE_PIPE)
+            elif self._match('|'):
                 self._add_token(TokenType.PIPE)
                 self.tokens.append(
                     Token(TokenType.PIPE, None, '|', self.line, self.column)
@@ -531,6 +537,11 @@ class Lexer:
             self._add_token(TokenType.CARET)
         elif char == '~':
             self._add_token(TokenType.TILDE)
+        elif char == '?':
+            if self._match('?'):
+                self._add_token(TokenType.ELVIS)
+            else:
+                self._add_token(TokenType.QUESTION)
         else:
             self._error(f"Unexpected character '{char}'")
 

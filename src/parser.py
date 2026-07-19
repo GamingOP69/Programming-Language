@@ -39,7 +39,7 @@ from errors import ParserError
 # Note: Assignment operators (=, +=, etc.) are NOT in this table.
 # They are handled at the statement level in _parse_expression_or_assignment.
 PRECEDENCE = {
-    TokenType.DOT_DOT: 1,          # .. (range)
+    TokenType.ELVIS: 1,            # ?? (null coalescing)
     TokenType.OR: 2,               # or
     TokenType.AND: 3,              # and
     TokenType.EQUAL_EQUAL: 4,      # ==
@@ -59,8 +59,10 @@ PRECEDENCE = {
     TokenType.SLASH: 11,           # /
     TokenType.PERCENT: 11,         # %
     TokenType.STAR_STAR: 12,       # **
-    TokenType.NOT: 13,             # not (unary)
-    TokenType.TILDE: 13,           # ~ (unary)
+    TokenType.PIPE_PIPE: 13,       # |> (pipe operator)
+    TokenType.NOT: 14,             # not (unary)
+    TokenType.TILDE: 14,           # ~ (unary)
+    TokenType.QUESTION: 15,        # ? (ternary)
 }
 
 # Tokens that can start an expression

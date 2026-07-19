@@ -1,5 +1,40 @@
 # Changelog
 
+## [1.1.0] — 2026-07-19
+
+### New Language Features
+
+#### Operators
+- **Pipe operator (`|>`)** — Chain function calls: `value |> func` passes `value` as argument to `func`
+- **Null coalescing (`??`)** — Default values for null: `value ?? fallback` returns `fallback` if `value` is null
+- **Lambda arrow (`=>`)** — Function shorthand: `x => x * 2` creates an anonymous function
+- **Ternary (`?`)** — Inline conditionals: `condition ? true_value : false_value`
+- **Spread (`...`)** — Array/map expansion: `[...arr, 4, 5]` merges arrays
+
+#### Keywords
+- `lambda` — Create anonymous functions
+- `yield` — Generator function support
+
+#### Enhanced Standard Library
+- `json` module: `parse`, `stringify`
+- `datetime` module: `now`, `format`, `parse`
+- `collections` module: `count`, `group_by`, `flatten`
+- Extended array methods: `map`, `filter`, `reduce`, `find`, `slice`
+- Extended string methods: `starts_with`, `ends_with`, `includes`, `repeat`
+
+#### CLI Improvements
+- `samrat watch <file>` — Auto-reload on file changes
+- `samrat init` — Interactive project initialization with templates
+- `samrat run --vm` — Use bytecode VM instead of interpreter
+- `samrat build` — Build and run with VM
+
+#### CI/CD
+- Cross-platform release builds (Linux + Windows executables)
+- Release job reuses build artifacts (no duplicate PyInstaller builds)
+- Removed Python 3.8 from test matrix (faster CI)
+- Added pip upgrade step
+- Updated GitHub Actions to latest versions
+
 ## [1.0.0] — 2026-07-19
 
 ### Initial Release
