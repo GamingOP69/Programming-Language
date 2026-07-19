@@ -123,45 +123,9 @@ jobs:
         name: security-report
         path: security-report.json
 
-  release-build:
-    name: Release build (${{ matrix.os }})
+  release:
+    name: Release ${{ github.ref_name }}
     needs: [test, lint, build, security]
-    if: startsWith(github.ref, 'refs/tags/v')
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-
-    steps:
-    - uses: actions/checkout@v7
-
-    - name: Set up Python
-      uses: actions/setup-python@v6
-      with:
-        python-version: '3.12'
-
-    - name: Install PyInstaller
-      run: |
-        python -m pip install pyinstaller
-
-    - name: Build executable
-      run: |
-        cd src
-        pyinstaller --onefile --name samrat-${{ runner.os }} main.py
-        pyinstaller --onefile --name samrat-cli-${{ runner.os }} cli.py
-
-    - name: Upload release artifacts
-      uses: actions/upload-artifact@v7
-      with:
-        name: release-${{ runner.os }}
-        path: |
-          src/dist/*
-        if-no-files-found: error
-
-  create-release:
-    name: Create GitHub Release
-    needs: [release-build]
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     permissions:
@@ -170,34 +134,26 @@ jobs:
     steps:
     - uses: actions/checkout@v7
 
-    - name: Download release artifacts
+    - name: Download all build artifacts
       uses: actions/download-artifact@v8
       with:
         path: release-assets
-        pattern: release-*
+        pattern: samrat-*
         merge-multiple: true
 
     - name: Create source archives
       run: |
         python - <<'PY'
-        import pathlib
-        import tarfile
-        import zipfile
-
+        import pathlib, tarfile, zipfile
         root = pathlib.Path('.')
         exclude = {'.git', 'build', 'dist', 'release-assets', '__pycache__'}
-
         with tarfile.open('samrat-source.tar.gz', 'w:gz') as tar:
             for path in root.iterdir():
-                if path.name in exclude:
-                    continue
-                tar.add(path, arcname=path.name)
-
+                if path.name not in exclude:
+                    tar.add(path, arcname=path.name)
         with zipfile.ZipFile('samrat-source.zip', 'w', zipfile.ZIP_DEFLATED) as zf:
             for path in root.rglob('*'):
-                if any(part in exclude for part in path.parts):
-                    continue
-                if path.is_file():
+                if not any(part in exclude for part in path.parts) and path.is_file():
                     zf.write(path, arcname=str(path).replace('\\', '/'))
         PY
 
