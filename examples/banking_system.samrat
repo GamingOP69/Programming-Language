@@ -9,7 +9,7 @@ class Account {
     }
 
     func deposit(amount: float) {
-        if amount <= 0 {
+        if amount <= 0.0 {
             throw "Deposit amount must be positive"
         }
         this.balance = this.balance + amount
@@ -17,7 +17,7 @@ class Account {
     }
 
     func withdraw(amount: float) {
-        if amount <= 0 {
+        if amount <= 0.0 {
             throw "Withdrawal amount must be positive"
         }
         if amount > this.balance {

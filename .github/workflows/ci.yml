@@ -9,7 +9,6 @@ on:
     branches: [ main ]
 
 jobs:
-  # ─── Test Job — runs on ALL pushes and PRs ────────────────────────────
   test:
     name: Test (${{ matrix.os }} / Python ${{ matrix.python-version }})
     runs-on: ${{ matrix.os }}
@@ -42,7 +41,6 @@ jobs:
         cd tests
         python run_all.py
 
-  # ─── Lint Job — runs on ALL pushes and PRs ────────────────────────────
   lint:
     name: Lint
     runs-on: ubuntu-latest
@@ -56,15 +54,13 @@ jobs:
 
     - name: Install linters
       run: |
-        python -m pip install --upgrade pip
-        pip install flake8
+        python -m pip install flake8
 
     - name: Lint with flake8
       run: |
         flake8 src/ --count --select=E9,F63,F7,F82 --show-source --statistics
         flake8 src/ --count --max-complexity=15 --max-line-length=120 --statistics
 
-  # ─── Build Job — runs on ALL pushes and PRs ───────────────────────────
   build:
     name: Build (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
@@ -83,8 +79,7 @@ jobs:
 
     - name: Install PyInstaller
       run: |
-        python -m pip install --upgrade pip
-        pip install pyinstaller
+        python -m pip install pyinstaller
 
     - name: Build executable
       run: |
@@ -98,8 +93,8 @@ jobs:
         name: samrat-${{ runner.os }}
         path: |
           src/dist/samrat-*
+        if-no-files-found: warn
 
-  # ─── Security Scan — runs on ALL pushes and PRs ───────────────────────
   security:
     name: Security Scan
     runs-on: ubuntu-latest
@@ -113,8 +108,7 @@ jobs:
 
     - name: Install bandit
       run: |
-        python -m pip install --upgrade pip
-        pip install bandit
+        python -m pip install bandit
 
     - name: Security scan
       run: |
@@ -126,16 +120,15 @@ jobs:
         name: security-report
         path: security-report.json
 
-  # ─── Release Job — runs ONLY on version tags (v*) ────────────────────
-  release:
-    name: Release ${{ github.ref_name }}
+  release-build:
+    name: Release build (${{ matrix.os }})
     needs: [test, lint, build, security]
     if: startsWith(github.ref, 'refs/tags/v')
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      id-token: write
-      attestations: write
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
     - uses: actions/checkout@v7
@@ -145,29 +138,82 @@ jobs:
       with:
         python-version: '3.12'
 
-    - name: Install dependencies
+    - name: Install PyInstaller
       run: |
-        python -m pip install --upgrade pip
-        pip install pyinstaller
+        python -m pip install pyinstaller
 
-    - name: Build Linux executables
+    - name: Build executable
       run: |
         cd src
-        pyinstaller --onefile --name samrat-linux main.py
-        pyinstaller --onefile --name samrat-cli-linux cli.py
-        mkdir -p ../dist
-        mv dist/samrat-linux ../dist/
-        mv dist/samrat-cli-linux ../dist/
+        pyinstaller --onefile --name samrat-${{ runner.os }} main.py
+        pyinstaller --onefile --name samrat-cli-${{ runner.os }} cli.py
 
-    - name: Upload artifacts to release
-      uses: softprops/action-gh-release@v3
+    - name: Upload release artifacts
+      uses: actions/upload-artifact@v7
+      with:
+        name: release-${{ runner.os }}
+        path: |
+          src/dist/*
+        if-no-files-found: error
+
+  create-release:
+    name: Create GitHub Release
+    needs: [release-build]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+    - uses: actions/checkout@v7
+
+    - name: Download release artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: release-assets
+        pattern: release-*
+        merge-multiple: true
+
+    - name: Create source archives
+      run: |
+        python - <<'PY'
+        import pathlib
+        import tarfile
+        import zipfile
+
+        root = pathlib.Path('.')
+        exclude = {'.git', 'build', 'dist', 'release-assets', '__pycache__'}
+
+        with tarfile.open('samrat-source.tar.gz', 'w:gz') as tar:
+            for path in root.iterdir():
+                if path.name in exclude:
+                    continue
+                tar.add(path, arcname=path.name)
+
+        with zipfile.ZipFile('samrat-source.zip', 'w', zipfile.ZIP_DEFLATED) as zf:
+            for path in root.rglob('*'):
+                if any(part in exclude for part in path.parts):
+                    continue
+                if path.is_file():
+                    zf.write(path, arcname=str(path).replace('\\', '/'))
+        PY
+
+    - name: Generate checksums
+      run: |
+        cd release-assets
+        sha256sum * > ../checksums.txt
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
       with:
         name: Samrat ${{ github.ref_name }}
         body_path: docs/CHANGELOG.md
         draft: false
         prerelease: false
         files: |
-          dist/samrat-linux
-          dist/samrat-cli-linux
+          release-assets/*
+          samrat-source.tar.gz
+          samrat-source.zip
+          checksums.txt
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

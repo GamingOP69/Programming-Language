@@ -15,8 +15,9 @@ print("After pop: " + str(arr))
 arr.insert(0, 99)
 print("After insert: " + str(arr))
 
-arr.remove(0)
-print("After remove: " + str(arr))
+// Remove by value (not index)
+arr.remove(99)
+print("After remove 99: " + str(arr))
 
 arr.sort()
 print("Sorted: " + str(arr))

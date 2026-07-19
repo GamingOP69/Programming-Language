@@ -13,8 +13,15 @@ class TodoList {
 
     func remove(index: int) {
         if index >= 0 and index < len(this.tasks) {
+            // Build new array without the removed item
+            let new_tasks = []
+            for i in 0..len(this.tasks) {
+                if i != index {
+                    new_tasks.append(this.tasks[i])
+                }
+            }
             let removed = this.tasks[index]
-            this.tasks.remove(index)
+            this.tasks = new_tasks
             print("Removed: \"" + removed + "\"")
         } else {
             print("Invalid index: " + str(index))
@@ -44,4 +51,5 @@ todo.add("Write tests")
 todo.list()
 print("Total tasks: " + str(todo.count()))
 todo.remove(1)
+print("After removal:")
 todo.list()
