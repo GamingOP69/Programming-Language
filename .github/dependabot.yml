@@ -1,15 +1,11 @@
-# Dependabot configuration for Samrat Programming Language
-# https://docs.github.com/en/code-security/dependabot
-
 version: 2
 updates:
-  # GitHub Actions
+  # ─── GitHub Actions ────────────────────────────────────────────────────────
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "09:00"
+      interval: "daily"
+      time: "07:00"
       timezone: "Asia/Katmandu"
     labels:
       - "dependencies"
@@ -23,14 +19,17 @@ updates:
       - "GamingOP69"
     assignees:
       - "GamingOP69"
+    groups:
+      github-actions:
+        patterns:
+          - "*"  # group all action updates together
 
-  # Python / pip
+  # ─── Python / pip ──────────────────────────────────────────────────────────
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "09:00"
+      interval: "daily"
+      time: "07:00"
       timezone: "Asia/Katmandu"
     labels:
       - "dependencies"
@@ -44,8 +43,10 @@ updates:
       - "GamingOP69"
     assignees:
       - "GamingOP69"
-    allow:
-      - dependency-type: "direct"
+    groups:
+      python-dependencies:
+        patterns:
+          - "*"  # group all pip updates together (optional)
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-patch"]
