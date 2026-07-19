@@ -1,32 +1,78 @@
 # Auto detect text files and perform LF normalization
-* text=auto
+* text=auto eol=lf
 
 # Source files
 *.py text diff=python
 *.samrat text
 *.sam text
-*.md text
+*.md text diff=markdown
 *.txt text
 *.json text
-*.yml text
-*.yaml text
 *.toml text
 *.cfg text
 *.ini text
 *.reg text
+*.css text
+*.html text
+*.js text
+*.ts text
+*.xml text
+*.svg text
+
+# YAML/CI files - force LF to avoid CRLF warnings
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# Shell scripts - force LF
+*.sh text eol=lf
+*.bash text eol=lf
+*.zsh text eol=lf
+
+# Batch files - force CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Makefile - force LF
+Makefile text eol=lf
+makefile text eol=lf
+GNUmakefile text eol=lf
+
+# Python files - force LF
+*.py text eol=lf
 
 # Binary files
 *.png binary
 *.jpg binary
+*.jpeg binary
+*.gif binary
 *.ico binary
+*.bmp binary
+*.webp binary
 *.exe binary
 *.msi binary
 *.dmg binary
 *.deb binary
+*.rpm binary
+*.AppImage binary
+*.dll binary
+*.so binary
+*.dylib binary
+*.pdf binary
+*.zip binary
+*.tar.gz binary
+*.gz binary
+*.ttf binary
+*.otf binary
+*.woff binary
+*.woff2 binary
+*.eot binary
 
-# Documentation
-*.md diff=markdown
+# Linguist overrides (treat .samrat/.sam as its own language)
+*.samrat linguist-language=Samrat linguist-detectable=true
+*.sam linguist-language=Samrat linguist-detectable=true
 
-# Linguist overrides
-*.samrat linguist-language=JavaScript linguist-detectable=true
-*.sam linguist-language=JavaScript linguist-detectable=true
+# Git generated files
+.gitattributes export-ignore
+.gitignore export-ignore
+.editorconfig export-ignore
