@@ -20,29 +20,22 @@ jobs:
         python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v7
+    - uses: actions/checkout@v4
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-        cache: 'pip'  # automatically caches pip packages
-
-    - name: Install dependencies (if any)
-      run: |
-        python -m pip install --upgrade pip
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
     - name: Run comprehensive tests
       run: |
         cd tests
-        python test_comprehensive.py || true  # continue even if one fails
+        python test_comprehensive.py
 
     - name: Run compiler tests
       run: |
         cd tests
-        python test_compiler.py || true
+        python test_compiler.py
 
     - name: Run all tests (combined)
       run: |
@@ -54,19 +47,16 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v7
+    - uses: actions/checkout@v4
 
     - name: Set up Python
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@v5
       with:
         python-version: '3.12'
-        cache: 'pip'
 
-    - name: Install linters and dependencies
+    - name: Install linters
       run: |
         python -m pip install --upgrade pip
-        if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
         pip install flake8
 
     - name: Lint with flake8
@@ -84,64 +74,57 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v7
+    - uses: actions/checkout@v4
 
     - name: Set up Python
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@v5
       with:
         python-version: '3.12'
-        cache: 'pip'
 
     - name: Install PyInstaller
       run: |
         python -m pip install --upgrade pip
         pip install pyinstaller
 
-    - name: Build executables
+    - name: Build executable
       run: |
         cd src
         pyinstaller --onefile --name samrat-${{ runner.os }} main.py
         pyinstaller --onefile --name samrat-cli-${{ runner.os }} cli.py
-        mkdir -p ../dist
-        cp dist/* ../dist/
 
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v7
+      uses: actions/upload-artifact@v4
       with:
         name: samrat-${{ runner.os }}
-        path: dist/
-        retention-days: 7
+        path: |
+          src/dist/samrat-*
 
   # ─── Security Scan — runs on ALL pushes and PRs ───────────────────────
   security:
     name: Security Scan
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v7
+    - uses: actions/checkout@v4
 
     - name: Set up Python
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@v5
       with:
         python-version: '3.12'
-        cache: 'pip'
 
     - name: Install bandit
       run: |
         python -m pip install --upgrade pip
         pip install bandit
 
-    - name: Run security scan
+    - name: Security scan
       run: |
         bandit -r src/ -f json -o security-report.json || true
 
     - name: Upload security report
-      uses: actions/upload-artifact@v7
+      uses: actions/upload-artifact@v4
       with:
         name: security-report
         path: security-report.json
-        retention-days: 7
 
   # ─── Release Job — runs ONLY on version tags (v*) ────────────────────
   release:
@@ -151,37 +134,31 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v7
+    - uses: actions/checkout@v4
 
-    - name: Download all built artifacts
-      uses: actions/download-artifact@v8
+    - name: Set up Python
+      uses: actions/setup-python@v5
       with:
-        path: ./artifacts
+        python-version: '3.12'
 
-    - name: Prepare release assets
+    - name: Install dependencies
       run: |
-        mkdir -p release-assets
-        # Copy binaries from each OS (rename consistently)
-        cp artifacts/samrat-ubuntu-latest/*.exe* release-assets/ 2>/dev/null || true
-        cp artifacts/samrat-windows-latest/*.exe* release-assets/ 2>/dev/null || true
-        cp artifacts/samrat-macos-latest/* release-assets/ 2>/dev/null || true
-        # Also copy source archives (if any)
-        cp samrat-source.tar.gz release-assets/ 2>/dev/null || true
-        cp samrat-source.zip release-assets/ 2>/dev/null || true
+        python -m pip install --upgrade pip
+        pip install pyinstaller
 
-    - name: Generate checksums for all assets
+    - name: Build Linux executables
       run: |
-        cd release-assets
-        sha256sum * > checksums.txt
+        cd src
+        pyinstaller --onefile --name samrat-linux main.py
+        pyinstaller --onefile --name samrat-cli-linux cli.py
 
     - name: Create GitHub Release
-      uses: softprops/action-gh-release@v3
+      uses: softprops/action-gh-release@v1
       with:
         name: Samrat ${{ github.ref_name }}
         body_path: docs/CHANGELOG.md
         draft: false
         prerelease: false
-        files: release-assets/*
+        files: src/dist/*
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

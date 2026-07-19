@@ -4,49 +4,8 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "daily"
-      time: "07:00"
-      timezone: "Asia/Katmandu"
+      interval: "weekly"
     labels:
       - "dependencies"
-      - "github-actions"
-    commit-message:
-      prefix: "chore"
-      prefix-development: "chore"
-      include: "scope"
-    open-pull-requests-limit: 10
     reviewers:
       - "GamingOP69"
-    assignees:
-      - "GamingOP69"
-    groups:
-      github-actions:
-        patterns:
-          - "*"  # group all action updates together
-
-  # ─── Python / pip ──────────────────────────────────────────────────────────
-  - package-ecosystem: "pip"
-    directory: "/"
-    schedule:
-      interval: "daily"
-      time: "07:00"
-      timezone: "Asia/Katmandu"
-    labels:
-      - "dependencies"
-      - "python"
-    commit-message:
-      prefix: "chore"
-      prefix-development: "chore"
-      include: "scope"
-    open-pull-requests-limit: 10
-    reviewers:
-      - "GamingOP69"
-    assignees:
-      - "GamingOP69"
-    groups:
-      python-dependencies:
-        patterns:
-          - "*"  # group all pip updates together (optional)
-    ignore:
-      - dependency-name: "*"
-        update-types: ["version-update:semver-patch"]
