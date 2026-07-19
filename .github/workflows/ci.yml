@@ -132,6 +132,10 @@ jobs:
     needs: [test, lint, build, security]
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
 
     steps:
     - uses: actions/checkout@v7
@@ -151,14 +155,19 @@ jobs:
         cd src
         pyinstaller --onefile --name samrat-linux main.py
         pyinstaller --onefile --name samrat-cli-linux cli.py
+        mkdir -p ../dist
+        mv dist/samrat-linux ../dist/
+        mv dist/samrat-cli-linux ../dist/
 
-    - name: Create GitHub Release
+    - name: Upload artifacts to release
       uses: softprops/action-gh-release@v3
       with:
         name: Samrat ${{ github.ref_name }}
         body_path: docs/CHANGELOG.md
         draft: false
         prerelease: false
-        files: src/dist/*
+        files: |
+          dist/samrat-linux
+          dist/samrat-cli-linux
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
