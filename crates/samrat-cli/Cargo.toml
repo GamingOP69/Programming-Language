@@ -1,0 +1,20 @@
+[package]
+name = "samrat-cli"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+samrat-lexer = { path = "../samrat-lexer" }
+samrat-parser = { path = "../samrat-parser" }
+samrat-semantic = { path = "../samrat-semantic" }
+samrat-ir = { path = "../samrat-ir" }
+samrat-codegen = { path = "../samrat-codegen" }
+samrat-runtime = { path = "../samrat-runtime" }
+samrat-stdlib = { path = "../samrat-stdlib" }
+samrat-pkg = { path = "../samrat-pkg" }
+samrat-debug = { path = "../samrat-debug" }
+clap = { version = "4.5", features = ["derive"] }
+colored = "2.1"
+anyhow = "1.0"
+tempfile = "3.10"
+toml = "0.8"
