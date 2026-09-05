@@ -1,7 +1,0 @@
-[package]
-name = "samrat-lexer"
-version.workspace = true
-edition.workspace = true
-
-[dependencies]
-thiserror = "1.0"

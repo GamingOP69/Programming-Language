@@ -1,7 +1,0 @@
-[package]
-name = "samrat-stdlib"
-version.workspace = true
-edition.workspace = true
-
-[dependencies]
-samrat-runtime = { path = "../samrat-runtime" }

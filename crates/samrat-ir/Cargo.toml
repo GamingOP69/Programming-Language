@@ -1,9 +1,0 @@
-[package]
-name = "samrat-ir"
-version.workspace = true
-edition.workspace = true
-
-[dependencies]
-samrat-lexer = { path = "../samrat-lexer" }
-samrat-parser = { path = "../samrat-parser" }
-samrat-semantic = { path = "../samrat-semantic" }

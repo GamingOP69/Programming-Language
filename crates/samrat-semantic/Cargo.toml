@@ -1,9 +1,0 @@
-[package]
-name = "samrat-semantic"
-version.workspace = true
-edition.workspace = true
-
-[dependencies]
-samrat-lexer = { path = "../samrat-lexer" }
-samrat-parser = { path = "../samrat-parser" }
-thiserror = "1.0"
