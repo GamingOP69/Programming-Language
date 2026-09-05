@@ -1,3 +1,6 @@
+# Rust / Cargo
+target/
+
 # Python
 __pycache__/
 *.py[cod]
@@ -8,20 +11,27 @@ dist/
 build/
 *.egg
 .eggs/
-
-# Virtual environments
+.Python
+env/
 venv/
 .venv/
-env/
-.env/
+ENV/
+develop-eggs/
+downloads/
+parts/
+sdist/
+var/
+.installed.cfg
 
-# IDE
+# IDEs & OS
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 .DS_Store
+Thumbs.db
+Desktop.ini
 
 # Build artifacts
 *.exe
@@ -33,8 +43,6 @@ env/
 samrat.spec
 
 # Distribution
-dist/
-build/
 *.zip
 *.tar.gz
 
@@ -56,7 +64,3 @@ samrat.log
 .env
 .env.local
 .env.production
-
-# OS files
-Thumbs.db
-Desktop.ini
