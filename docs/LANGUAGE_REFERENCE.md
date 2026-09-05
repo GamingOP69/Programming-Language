@@ -18,6 +18,7 @@ When the program starts, set total to 0.
 ## Structured Syntax Overview
 
 ```
+```samrat
 // Variables
 let x = 5
 let name: str = "Samrat"
@@ -33,6 +34,17 @@ if condition { } elif other { } else { }
 while condition { }
 for i in 0..10 { }
 for item in collection { }
+
+// Classes
+class Person {
+    let name: str
+    constructor(name: str) {
+        this.name = name
+    }
+    func greet() -> str {
+        return "Hello, " + this.name
+    }
+}
 ```
 
 ## Toolchain Integration

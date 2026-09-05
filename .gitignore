@@ -1,34 +1,66 @@
+# Rust / Cargo
+target/
+
+# Python
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
 .Python
 env/
 venv/
+.venv/
 ENV/
-build/
 develop-eggs/
-dist/
 downloads/
-eggs/
-.eggs/
-lib/
-lib64/
 parts/
 sdist/
 var/
-*.egg-info/
 .installed.cfg
-*.egg
-.pytest_cache/
-.coverage
-htmlcov/
-.idea/
+
+# IDEs & OS
 .vscode/
+.idea/
 *.swp
 *.swo
 *~
 .DS_Store
 Thumbs.db
-target/
-target
+Desktop.ini
+
+# Build artifacts
+*.exe
+*.msi
+*.dmg
+*.deb
+*.rpm
+*.AppImage
+samrat.spec
+
+# Distribution
+*.zip
+*.tar.gz
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+coverage/
+
+# Documentation
+docs/_build/
+docs/.vitepress/dist/
+
+# Logs
+*.log
+samrat.log
+
+# Environment
+.env
+.env.local
+.env.production
