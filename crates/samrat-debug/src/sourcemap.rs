@@ -1,3 +1,4 @@
+#[derive(Default)]
 pub struct SourceLocation {
     pub file: String,
     pub line: usize,
@@ -10,10 +11,18 @@ pub struct SourceMap {
 
 impl SourceMap {
     pub fn new() -> Self {
-        Self { mappings: Vec::new() }
+        Self {
+            mappings: Vec::new(),
+        }
     }
 
     pub fn add_mapping(&mut self, instruction_offset: usize, loc: SourceLocation) {
         self.mappings.push((instruction_offset, loc));
+    }
+}
+
+impl Default for SourceMap {
+    fn default() -> Self {
+        Self::new()
     }
 }

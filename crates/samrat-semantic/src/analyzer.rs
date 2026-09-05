@@ -1,6 +1,6 @@
-use samrat_parser::ast::*;
 use crate::symbol::{Symbol, SymbolTable};
 use crate::types::Type;
+use samrat_parser::ast::*;
 use thiserror::Error;
 
 #[derive(Error, Debug, PartialEq)]
@@ -48,11 +48,19 @@ impl SemanticAnalyzer {
                 }
                 self.symbols.exit_scope();
             }
-            Statement::CreateRangePipeline { variable, start, end, .. } => {
+            Statement::CreateRangePipeline {
+                variable,
+                start,
+                end,
+                ..
+            } => {
                 let start_ty = self.infer_expression(start)?;
                 let end_ty = self.infer_expression(end)?;
                 if start_ty != Type::Int || end_ty != Type::Int {
-                    return Err(SemanticError::TypeMismatch("Integer".to_string(), format!("{} and {}", start_ty, end_ty)));
+                    return Err(SemanticError::TypeMismatch(
+                        "Integer".to_string(),
+                        format!("{} and {}", start_ty, end_ty),
+                    ));
                 }
                 self.symbols.insert(Symbol {
                     name: variable.clone(),
@@ -71,20 +79,34 @@ impl SemanticAnalyzer {
                 }
             }
             Statement::Assignment { target, value } => {
-                let sym_ty = self.symbols.lookup(target)
-                    .ok_or_else(|| SemanticError::UndefinedSymbol(target.clone()))?.ty.clone();
+                let sym_ty = self
+                    .symbols
+                    .lookup(target)
+                    .ok_or_else(|| SemanticError::UndefinedSymbol(target.clone()))?
+                    .ty
+                    .clone();
                 let val_ty = self.infer_expression(value)?;
                 if sym_ty != Type::Unknown && val_ty != Type::Unknown && sym_ty != val_ty {
-                    return Err(SemanticError::TypeMismatch(sym_ty.to_string(), val_ty.to_string()));
+                    return Err(SemanticError::TypeMismatch(
+                        sym_ty.to_string(),
+                        val_ty.to_string(),
+                    ));
                 }
             }
             Statement::Print(expr) => {
                 self.infer_expression(expr)?;
             }
-            Statement::If { condition, then_branch, else_branch } => {
+            Statement::If {
+                condition,
+                then_branch,
+                else_branch,
+            } => {
                 let cond_ty = self.infer_expression(condition)?;
                 if cond_ty != Type::Bool && cond_ty != Type::Unknown {
-                    return Err(SemanticError::TypeMismatch("Boolean".to_string(), cond_ty.to_string()));
+                    return Err(SemanticError::TypeMismatch(
+                        "Boolean".to_string(),
+                        cond_ty.to_string(),
+                    ));
                 }
                 self.symbols.enter_scope();
                 for s in then_branch {
@@ -103,7 +125,10 @@ impl SemanticAnalyzer {
             Statement::While { condition, body } => {
                 let cond_ty = self.infer_expression(condition)?;
                 if cond_ty != Type::Bool && cond_ty != Type::Unknown {
-                    return Err(SemanticError::TypeMismatch("Boolean".to_string(), cond_ty.to_string()));
+                    return Err(SemanticError::TypeMismatch(
+                        "Boolean".to_string(),
+                        cond_ty.to_string(),
+                    ));
                 }
                 self.symbols.enter_scope();
                 for s in body {
@@ -111,7 +136,11 @@ impl SemanticAnalyzer {
                 }
                 self.symbols.exit_scope();
             }
-            Statement::For { variable, iterable, body } => {
+            Statement::For {
+                variable,
+                iterable,
+                body,
+            } => {
                 let _iter_ty = self.infer_expression(iterable)?;
                 self.symbols.enter_scope();
                 self.symbols.insert(Symbol {
@@ -124,7 +153,12 @@ impl SemanticAnalyzer {
                 }
                 self.symbols.exit_scope();
             }
-            Statement::FunctionDeclaration { name, parameters, body, .. } => {
+            Statement::FunctionDeclaration {
+                name,
+                parameters,
+                body,
+                ..
+            } => {
                 self.symbols.insert(Symbol {
                     name: name.clone(),
                     ty: Type::Function {
@@ -165,7 +199,9 @@ impl SemanticAnalyzer {
             Expression::Boolean(_) => Ok(Type::Bool),
             Expression::Null => Ok(Type::Null),
             Expression::Variable(name) => {
-                let sym = self.symbols.lookup(name)
+                let sym = self
+                    .symbols
+                    .lookup(name)
                     .ok_or_else(|| SemanticError::UndefinedSymbol(name.clone()))?;
                 Ok(sym.ty.clone())
             }
@@ -173,16 +209,23 @@ impl SemanticAnalyzer {
                 let l_ty = self.infer_expression(left)?;
                 let r_ty = self.infer_expression(right)?;
                 match op {
-                    BinaryOperator::Add | BinaryOperator::Subtract | BinaryOperator::Multiply | BinaryOperator::Divide | BinaryOperator::Modulo => {
+                    BinaryOperator::Add
+                    | BinaryOperator::Subtract
+                    | BinaryOperator::Multiply
+                    | BinaryOperator::Divide
+                    | BinaryOperator::Modulo => {
                         if l_ty == Type::Float || r_ty == Type::Float {
                             Ok(Type::Float)
                         } else {
                             Ok(Type::Int)
                         }
                     }
-                    BinaryOperator::Equal | BinaryOperator::NotEqual | BinaryOperator::LessThan | BinaryOperator::GreaterThan | BinaryOperator::LessEqual | BinaryOperator::GreaterEqual => {
-                        Ok(Type::Bool)
-                    }
+                    BinaryOperator::Equal
+                    | BinaryOperator::NotEqual
+                    | BinaryOperator::LessThan
+                    | BinaryOperator::GreaterThan
+                    | BinaryOperator::LessEqual
+                    | BinaryOperator::GreaterEqual => Ok(Type::Bool),
                     BinaryOperator::And | BinaryOperator::Or => Ok(Type::Bool),
                 }
             }
@@ -197,7 +240,9 @@ impl SemanticAnalyzer {
                 for arg in arguments {
                     self.infer_expression(arg)?;
                 }
-                let sym = self.symbols.lookup(callee)
+                let sym = self
+                    .symbols
+                    .lookup(callee)
                     .ok_or_else(|| SemanticError::UndefinedSymbol(callee.clone()))?;
                 if let Type::Function { return_type, .. } = &sym.ty {
                     Ok(*return_type.clone())
@@ -219,6 +264,12 @@ impl SemanticAnalyzer {
                 }
             }
         }
+    }
+}
+
+impl Default for SemanticAnalyzer {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

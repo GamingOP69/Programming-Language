@@ -14,4 +14,14 @@ impl<T> SamratArray<T> {
     pub fn len(&self) -> usize {
         self.data.len()
     }
+
+    pub fn is_empty(&self) -> bool {
+        self.data.is_empty()
+    }
+}
+
+impl<T> Default for SamratArray<T> {
+    fn default() -> Self {
+        Self::new()
+    }
 }

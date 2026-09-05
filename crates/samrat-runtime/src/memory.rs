@@ -3,11 +3,17 @@ use std::alloc::{alloc, dealloc, Layout};
 pub struct MemoryManager;
 
 impl MemoryManager {
+    /// # Safety
+    ///
+    /// The caller must ensure that `size` and `align` define a valid layout.
     pub unsafe fn allocate(size: usize, align: usize) -> *mut u8 {
         let layout = Layout::from_size_align_unchecked(size, align);
         alloc(layout)
     }
 
+    /// # Safety
+    ///
+    /// The caller must ensure `ptr` was allocated with the same `size` and `align`.
     pub unsafe fn deallocate(ptr: *mut u8, size: usize, align: usize) {
         let layout = Layout::from_size_align_unchecked(size, align);
         dealloc(ptr, layout);

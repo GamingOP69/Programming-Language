@@ -25,7 +25,10 @@ impl std::fmt::Display for Type {
             Type::Null => write!(f, "Null"),
             Type::Array(inner) => write!(f, "Array[{}]", inner),
             Type::Pointer(inner) => write!(f, "Pointer[{}]", inner),
-            Type::Function { params, return_type } => {
+            Type::Function {
+                params,
+                return_type,
+            } => {
                 let params_str: Vec<String> = params.iter().map(|p| p.to_string()).collect();
                 write!(f, "fn({}) -> {}", params_str.join(", "), return_type)
             }

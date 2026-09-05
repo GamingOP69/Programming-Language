@@ -10,6 +10,9 @@ impl Debugger {
     }
 
     pub fn debug_info(&self) -> String {
-        format!("Loaded debug session with {} source mappings", self.source_map.mappings.len())
+        format!(
+            "Loaded debug session with {} source mappings",
+            self.source_map.mappings.len()
+        )
     }
 }

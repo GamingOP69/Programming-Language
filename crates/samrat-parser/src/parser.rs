@@ -1,5 +1,5 @@
-use samrat_lexer::{Token, TokenType};
 use crate::ast::*;
+use samrat_lexer::{Token, TokenType};
 use thiserror::Error;
 
 #[derive(Error, Debug, PartialEq)]
@@ -77,7 +77,12 @@ impl Parser {
     }
 
     fn skip_separators(&mut self) {
-        while self.match_token(&[TokenType::Newline, TokenType::Period, TokenType::Comma, TokenType::Semicolon]) {}
+        while self.match_token(&[
+            TokenType::Newline,
+            TokenType::Period,
+            TokenType::Comma,
+            TokenType::Semicolon,
+        ]) {}
     }
 
     pub fn parse(&mut self) -> Result<Program, ParserError> {
@@ -112,7 +117,10 @@ impl Parser {
         } else if self.match_token(&[TokenType::Define]) {
             self.parse_function_statement()
         } else if self.match_token(&[TokenType::Return]) {
-            if self.check(&TokenType::Newline) || self.check(&TokenType::Period) || self.check(&TokenType::Semicolon) {
+            if self.check(&TokenType::Newline)
+                || self.check(&TokenType::Period)
+                || self.check(&TokenType::Semicolon)
+            {
                 Ok(Statement::Return(None))
             } else {
                 let expr = self.parse_expression()?;
@@ -170,12 +178,11 @@ impl Parser {
                     // skip optional 'and'
                 }
 
-                if self.match_token(&[TokenType::Add]) {
-                    if self.match_token(&[TokenType::Them]) {
-                        if self.match_token(&[TokenType::Together]) {
-                            sum = true;
-                        }
-                    }
+                if self.match_token(&[TokenType::Add])
+                    && self.match_token(&[TokenType::Them])
+                    && self.match_token(&[TokenType::Together])
+                {
+                    sum = true;
                 }
 
                 if self.match_token(&[TokenType::Comma]) {
@@ -234,7 +241,10 @@ impl Parser {
 
     fn parse_create_statement(&mut self) -> Result<Statement, ParserError> {
         let mut _type_annotation = None;
-        if self.match_keyword_or_ident("variable") || self.match_keyword_or_ident("a") || self.match_keyword_or_ident("number") {
+        if self.match_keyword_or_ident("variable")
+            || self.match_keyword_or_ident("a")
+            || self.match_keyword_or_ident("number")
+        {
             // Optional descriptive words
         }
 
@@ -312,7 +322,10 @@ impl Parser {
             body.push(self.parse_statement()?);
         }
 
-        Ok(Statement::While { condition: cond, body })
+        Ok(Statement::While {
+            condition: cond,
+            body,
+        })
     }
 
     fn parse_for_statement(&mut self) -> Result<Statement, ParserError> {
@@ -412,7 +425,12 @@ impl Parser {
     fn parse_comparison(&mut self) -> Result<Expression, ParserError> {
         let mut expr = self.parse_term()?;
 
-        while self.match_token(&[TokenType::LessThan, TokenType::GreaterThan, TokenType::LessEqual, TokenType::GreaterEqual]) {
+        while self.match_token(&[
+            TokenType::LessThan,
+            TokenType::GreaterThan,
+            TokenType::LessEqual,
+            TokenType::GreaterEqual,
+        ]) {
             let op = match self.previous().token_type {
                 TokenType::LessThan => BinaryOperator::LessThan,
                 TokenType::GreaterThan => BinaryOperator::GreaterThan,
@@ -560,7 +578,14 @@ mod tests {
 
         assert_eq!(ast.statements.len(), 1);
         match &ast.statements[0] {
-            Statement::CreateRangePipeline { variable, start, end, filter_even, sum, show_total } => {
+            Statement::CreateRangePipeline {
+                variable,
+                start,
+                end,
+                filter_even,
+                sum,
+                show_total,
+            } => {
                 assert_eq!(variable, "numbers");
                 assert_eq!(*start, Expression::Integer(1));
                 assert_eq!(*end, Expression::Integer(100));
@@ -570,5 +595,31 @@ mod tests {
             }
             _ => panic!("Expected CreateRangePipeline AST node"),
         }
+    }
+}
+
+#[cfg(test)]
+mod edge_parser_tests {
+    use super::*;
+    use samrat_lexer::Lexer;
+
+    #[test]
+    fn test_parse_if_while_functions() {
+        let input = "
+define add_numbers(a, b) {
+    return a + b
+}
+
+if x == 10 {
+    show add_numbers(x, 5)
+} else {
+    show 0
+}
+";
+        let mut lexer = Lexer::new(input);
+        let tokens = lexer.tokenize().unwrap();
+        let mut parser = Parser::new(tokens);
+        let ast = parser.parse().unwrap();
+        assert_eq!(ast.statements.len(), 2);
     }
 }

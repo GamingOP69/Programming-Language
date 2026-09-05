@@ -1,5 +1,5 @@
-use std::collections::HashMap;
 use crate::types::Type;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
 pub struct Symbol {
@@ -48,5 +48,11 @@ impl SymbolTable {
             }
         }
         None
+    }
+}
+
+impl Default for SymbolTable {
+    fn default() -> Self {
+        Self::new()
     }
 }

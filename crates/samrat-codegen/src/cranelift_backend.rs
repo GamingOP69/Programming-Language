@@ -1,12 +1,12 @@
 use crate::backend::{Backend, CodegenError};
-use samrat_ir::ir::{IrModule, IrInstruction, IrValue};
-use cranelift_codegen::ir::{AbiParam, InstBuilder, types};
+use cranelift_codegen::ir::{types, AbiParam, InstBuilder};
 use cranelift_codegen::settings::{self, Flags};
 use cranelift_frontend::{FunctionBuilder, FunctionBuilderContext};
-use cranelift_module::{Module, Linkage};
+use cranelift_module::{Linkage, Module};
 use cranelift_object::{ObjectBuilder, ObjectModule};
-use target_lexicon::Triple;
+use samrat_ir::ir::{IrInstruction, IrModule, IrValue};
 use std::collections::HashMap;
+use target_lexicon::Triple;
 
 pub struct NativeCodegenBackend {
     target_triple: Triple,
@@ -20,6 +20,12 @@ impl NativeCodegenBackend {
     }
 }
 
+impl Default for NativeCodegenBackend {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Backend for NativeCodegenBackend {
     fn compile(&mut self, ir_module: &IrModule) -> Result<Vec<u8>, CodegenError> {
         let flag_builder = settings::builder();
@@ -29,15 +35,17 @@ impl Backend for NativeCodegenBackend {
             .finish(flags)
             .map_err(|e| CodegenError::CraneliftError(e.to_string()))?;
 
-        let builder = ObjectBuilder::new(isa, "samrat_app", cranelift_module::default_libcall_names())
-            .map_err(|e| CodegenError::CraneliftError(e.to_string()))?;
+        let builder =
+            ObjectBuilder::new(isa, "samrat_app", cranelift_module::default_libcall_names())
+                .map_err(|e| CodegenError::CraneliftError(e.to_string()))?;
         let mut module = ObjectModule::new(builder);
 
         for func in &ir_module.functions {
             let mut sig = module.make_signature();
             sig.returns.push(AbiParam::new(types::I64));
 
-            let func_id = module.declare_function(&func.name, Linkage::Export, &sig)
+            let func_id = module
+                .declare_function(&func.name, Linkage::Export, &sig)
                 .map_err(|e| CodegenError::CraneliftError(e.to_string()))?;
 
             let mut ctx = module.make_context();
@@ -55,13 +63,17 @@ impl Backend for NativeCodegenBackend {
 
             for inst in &func.instructions {
                 match inst {
-                    IrInstruction::CreateRangePipeline { start, end, filter_even, sum, dest } => {
+                    IrInstruction::CreateRangePipeline {
+                        start,
+                        end,
+                        filter_even,
+                        sum,
+                        dest,
+                    } => {
                         let mut total: i64 = 0;
                         for n in *start..=*end {
-                            if !*filter_even || n % 2 == 0 {
-                                if *sum {
-                                    total += n;
-                                }
+                            if (!*filter_even || n % 2 == 0) && *sum {
+                                total += n;
                             }
                         }
                         let val = builder.ins().iconst(types::I64, total);
@@ -71,7 +83,9 @@ impl Backend for NativeCodegenBackend {
                     IrInstruction::Print { value } => {
                         let val = match value {
                             IrValue::ConstantInt(i) => builder.ins().iconst(types::I64, *i),
-                            IrValue::Variable(v) => *var_map.get(v).unwrap_or(&builder.ins().iconst(types::I64, 0)),
+                            IrValue::Variable(v) => *var_map
+                                .get(v)
+                                .unwrap_or(&builder.ins().iconst(types::I64, 0)),
                             _ => builder.ins().iconst(types::I64, 0),
                         };
                         last_val = val;
@@ -79,7 +93,9 @@ impl Backend for NativeCodegenBackend {
                     IrInstruction::Return { value } => {
                         let ret_val = match value {
                             Some(IrValue::ConstantInt(i)) => builder.ins().iconst(types::I64, *i),
-                            Some(IrValue::Variable(v)) => *var_map.get(v).unwrap_or(&builder.ins().iconst(types::I64, 0)),
+                            Some(IrValue::Variable(v)) => *var_map
+                                .get(v)
+                                .unwrap_or(&builder.ins().iconst(types::I64, 0)),
                             _ => builder.ins().iconst(types::I64, 0),
                         };
                         last_val = ret_val;
@@ -92,13 +108,16 @@ impl Backend for NativeCodegenBackend {
             builder.seal_block(entry_block);
             builder.finalize();
 
-            module.define_function(func_id, &mut ctx)
+            module
+                .define_function(func_id, &mut ctx)
                 .map_err(|e| CodegenError::CraneliftError(e.to_string()))?;
             module.clear_context(&mut ctx);
         }
 
         let product = module.finish();
-        let bytes = product.emit().map_err(|e| CodegenError::CraneliftError(e.to_string()))?;
+        let bytes = product
+            .emit()
+            .map_err(|e| CodegenError::CraneliftError(e.to_string()))?;
         Ok(bytes)
     }
 }

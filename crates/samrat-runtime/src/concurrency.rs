@@ -1,4 +1,4 @@
-use std::sync::mpsc::{channel, Sender, Receiver};
+use std::sync::mpsc::{channel, Receiver, Sender};
 use std::thread;
 
 pub struct Channel<T> {
@@ -18,6 +18,12 @@ impl<T: Send + 'static> Channel<T> {
 
     pub fn recv(&self) -> Result<T, String> {
         self.receiver.recv().map_err(|e| e.to_string())
+    }
+}
+
+impl<T: Send + 'static> Default for Channel<T> {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

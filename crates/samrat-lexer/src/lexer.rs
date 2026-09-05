@@ -72,7 +72,12 @@ impl Lexer {
                 '.' => {
                     if self.peek_char() == '.' {
                         self.read_char();
-                        tokens.push(Token::new(TokenType::Range, "..", self.line, self.column - 1));
+                        tokens.push(Token::new(
+                            TokenType::Range,
+                            "..",
+                            self.line,
+                            self.column - 1,
+                        ));
                     } else {
                         tokens.push(Token::new(TokenType::Period, ".", self.line, self.column));
                     }
@@ -87,7 +92,12 @@ impl Lexer {
                     self.read_char();
                 }
                 ';' => {
-                    tokens.push(Token::new(TokenType::Semicolon, ";", self.line, self.column));
+                    tokens.push(Token::new(
+                        TokenType::Semicolon,
+                        ";",
+                        self.line,
+                        self.column,
+                    ));
                     self.read_char();
                 }
                 '(' => {
@@ -121,7 +131,12 @@ impl Lexer {
                 '-' => {
                     if self.peek_char() == '>' {
                         self.read_char();
-                        tokens.push(Token::new(TokenType::Arrow, "->", self.line, self.column - 1));
+                        tokens.push(Token::new(
+                            TokenType::Arrow,
+                            "->",
+                            self.line,
+                            self.column - 1,
+                        ));
                     } else {
                         tokens.push(Token::new(TokenType::Minus, "-", self.line, self.column));
                     }
@@ -142,7 +157,12 @@ impl Lexer {
                 '=' => {
                     if self.peek_char() == '=' {
                         self.read_char();
-                        tokens.push(Token::new(TokenType::EqualEqual, "==", self.line, self.column - 1));
+                        tokens.push(Token::new(
+                            TokenType::EqualEqual,
+                            "==",
+                            self.line,
+                            self.column - 1,
+                        ));
                     } else {
                         tokens.push(Token::new(TokenType::Equal, "=", self.line, self.column));
                     }
@@ -151,7 +171,12 @@ impl Lexer {
                 '!' => {
                     if self.peek_char() == '=' {
                         self.read_char();
-                        tokens.push(Token::new(TokenType::NotEqual, "!=", self.line, self.column - 1));
+                        tokens.push(Token::new(
+                            TokenType::NotEqual,
+                            "!=",
+                            self.line,
+                            self.column - 1,
+                        ));
                     } else {
                         tokens.push(Token::new(TokenType::Not, "!", self.line, self.column));
                     }
@@ -160,7 +185,12 @@ impl Lexer {
                 '<' => {
                     if self.peek_char() == '=' {
                         self.read_char();
-                        tokens.push(Token::new(TokenType::LessEqual, "<=", self.line, self.column - 1));
+                        tokens.push(Token::new(
+                            TokenType::LessEqual,
+                            "<=",
+                            self.line,
+                            self.column - 1,
+                        ));
                     } else {
                         tokens.push(Token::new(TokenType::LessThan, "<", self.line, self.column));
                     }
@@ -169,9 +199,19 @@ impl Lexer {
                 '>' => {
                     if self.peek_char() == '=' {
                         self.read_char();
-                        tokens.push(Token::new(TokenType::GreaterEqual, ">=", self.line, self.column - 1));
+                        tokens.push(Token::new(
+                            TokenType::GreaterEqual,
+                            ">=",
+                            self.line,
+                            self.column - 1,
+                        ));
                     } else {
-                        tokens.push(Token::new(TokenType::GreaterThan, ">", self.line, self.column));
+                        tokens.push(Token::new(
+                            TokenType::GreaterThan,
+                            ">",
+                            self.line,
+                            self.column,
+                        ));
                     }
                     self.read_char();
                 }
@@ -185,7 +225,11 @@ impl Lexer {
                     tokens.push(self.read_identifier());
                 }
                 _ => {
-                    return Err(LexerError::UnexpectedCharacter(self.ch, self.line, self.column));
+                    return Err(LexerError::UnexpectedCharacter(
+                        self.ch,
+                        self.line,
+                        self.column,
+                    ));
                 }
             }
         }
@@ -228,7 +272,12 @@ impl Lexer {
         }
 
         self.read_char(); // Skip close quote
-        Ok(Token::new(TokenType::StringLiteral(val.clone()), val, start_line, start_col))
+        Ok(Token::new(
+            TokenType::StringLiteral(val.clone()),
+            val,
+            start_line,
+            start_col,
+        ))
     }
 
     fn read_number(&mut self) -> Result<Token, LexerError> {
@@ -249,10 +298,20 @@ impl Lexer {
 
         if is_float {
             let val: f64 = num_str.parse().unwrap();
-            Ok(Token::new(TokenType::Float(val), num_str, self.line, start_col))
+            Ok(Token::new(
+                TokenType::Float(val),
+                num_str,
+                self.line,
+                start_col,
+            ))
         } else {
             let val: i64 = num_str.parse().unwrap();
-            Ok(Token::new(TokenType::Integer(val), num_str, self.line, start_col))
+            Ok(Token::new(
+                TokenType::Integer(val),
+                num_str,
+                self.line,
+                start_col,
+            ))
         }
     }
 
@@ -341,5 +400,24 @@ mod tests {
         assert_eq!(tokens[1].token_type, TokenType::The);
         assert_eq!(tokens[2].token_type, TokenType::Program);
         assert_eq!(tokens[3].token_type, TokenType::Starts);
+    }
+}
+
+#[cfg(test)]
+mod edge_tests {
+    use super::*;
+
+    #[test]
+    fn test_case_insensitivity_and_symbols() {
+        let input =
+            "WHEN THE PROGRAM STARTS.\nCREATE number_1 SET TO 42.5\nSHOW \"Hello world\\n\"";
+        let mut lexer = Lexer::new(input);
+        let tokens = lexer.tokenize().unwrap();
+        assert_eq!(tokens[0].token_type, TokenType::When);
+        assert_eq!(tokens[1].token_type, TokenType::The);
+        assert_eq!(tokens[2].token_type, TokenType::Program);
+        assert_eq!(tokens[3].token_type, TokenType::Starts);
+        assert_eq!(tokens[4].token_type, TokenType::Period);
+        assert_eq!(tokens[5].token_type, TokenType::Newline);
     }
 }
