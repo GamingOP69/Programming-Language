@@ -17,6 +17,7 @@ When the program starts, set total to 0.
 
 ## Structured Syntax Overview
 
+```
 ```samrat
 // Variables
 let x = 5
