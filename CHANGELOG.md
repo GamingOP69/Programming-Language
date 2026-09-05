@@ -2,6 +2,11 @@
 
 All notable changes to the Samrat Programming Language project will be documented in this file.
 
+## [V1.1.3] - 2026-09-05
+
+### Changed
+- Refreshed release documentation for the `V1.1.3` tag.
+
 ## [V1.1.5 / 2.0.0] - 2026-09-05
 
 ### Added
