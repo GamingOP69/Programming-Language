@@ -1,0 +1,8 @@
+[package]
+name = "samrat-debug"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+samrat-parser = { path = "../samrat-parser" }
+samrat-ir = { path = "../samrat-ir" }
